@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>اسعفني — ملف الفكرة</title>
+  <style>
+    :root {
+      --dark-blue: #193C68;
+      --dark-blue-2: #1F4A9E;
+      --red: #DC1B30;
+      --purple: #782850;
+      --white: #FFFFFF;
+      --border: rgba(255, 255, 255, 0.12);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background: radial-gradient(circle at 20% 10%, var(--dark-blue-2), var(--dark-blue) 65%);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px;
+    }
+    .card {
+      max-width: 760px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px 32px;
+      backdrop-filter: blur(6px);
+    }
+    .logo-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+    .logo-wrap svg { width: 160px; height: 160px; }
+    h1 { font-size: 42px; font-weight: 800; letter-spacing: 1px; }
+    .tagline {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 16px;
+      background: rgba(220, 27, 48, 0.75);
+      padding: 8px 18px;
+      border-radius: 999px;
+    }
+    section { margin-top: 28px; }
+    h2 {
+      font-size: 18px;
+      color: #F5A9B4;
+      border-right: 4px solid var(--purple);
+      padding-right: 10px;
+      margin-bottom: 14px;
+    }
+    .palette {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .swatch {
+      flex: 1;
+      min-width: 110px;
+      background: var(--c, #fff);
+      color: #000;
+      border-radius: 14px;
+      padding: 16px 12px;
+      text-align: center;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+    }
+    .swatch .name { font-size: 13px; font-weight: 700; }
+    .swatch .hex { font-size: 11px; opacity: 0.7; font-family: Consolas, monospace; }
+    .swatch.red .name, .swatch.red .hex { color: #FFF; }
+    .swatch.white .name { color: #222; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .chip {
+      background: var(--purple);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .note {
+      margin-top: 28px;
+      padding: 14px 16px;
+      border: 1px dashed var(--purple);
+      border-radius: 12px;
+      color: rgba(255,255,255,0.9);
+      font-size: 14px;
+      text-align: center;
+    }
+    .sections {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .sec {
+      flex: 1;
+      min-width: 200px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .sec h3 {
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .sec p { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo-wrap">
+      <!-- اللوجو -->
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#1F4A9E" />
+            <stop offset="1" stop-color="#193C68" />
+          </linearGradient>
+          <linearGradient id="crossGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#E63B46" />
+            <stop offset="1" stop-color="#DC1B30" />
+          </linearGradient>
+        </defs>
+        <circle cx="100" cy="100" r="98" fill="url(#bgGrad)" />
+        <g stroke="#782850" stroke-width="3" stroke-linecap="round" fill="none">
+          <path d="M 34 42 H 64 V 72" />
+          <path d="M 166 42 H 136 V 72" />
+          <path d="M 34 158 H 64 V 132" />
+          <path d="M 166 158 H 136 V 132" />
+        </g>
+        <g fill="#782850">
+          <circle cx="34" cy="42" r="5" />
+          <circle cx="166" cy="42" r="5" />
+          <circle cx="34" cy="158" r="5" />
+          <circle cx="166" cy="158" r="5" />
+        </g>
+        <rect x="93" y="66" width="14" height="14" rx="4" fill="#DC1B30" />
+        <rect x="93" y="66" width="14" height="7" rx="3.5" fill="#E63B46" />
+        <rect x="48" y="82" width="104" height="46" rx="10" fill="#FFFFFF" />
+        <rect x="143" y="90" width="7" height="28" rx="3.5" fill="#193C68" opacity="0.9" />
+        <g fill="url(#crossGrad)">
+          <rect x="70" y="93" width="14" height="24" rx="4" />
+          <rect x="63" y="100" width="28" height="14" rx="4" />
+        </g>
+        <g>
+          <circle cx="76" cy="127" r="7" fill="#FFFFFF" />
+          <circle cx="124" cy="127" r="7" fill="#FFFFFF" />
+          <circle cx="76" cy="127" r="3" fill="#193C68" />
+          <circle cx="124" cy="127" r="3" fill="#193C68" />
+        </g>
+      </svg>
+
+      <h1>اسعفني</h1>
+      <div class="tagline">زر واحدة… تنقذ حياة</div>
+    </div>
+
+    <section>
+      <h2>الألوان المعتمدة</h2>
+      <div class="palette">
+        <div class="swatch" style="--c:#193C68;">
+          <div class="name">الأزرق الداكن</div>
+          <div class="hex">#193C68</div>
+        </div>
+        <div class="swatch red" style="--c:#DC1B30;">
+          <div class="name">أحمر الطوارئ</div>
+          <div class="hex">#DC1B30</div>
+        </div>
+        <div class="swatch" style="--c:#782850;">
+          <div class="name">البنفسجي</div>
+          <div class="hex">#782850</div>
+        </div>
+        <div class="swatch white" style="--c:#FFFFFF;">
+          <div class="name">الأبيض</div>
+          <div class="hex">#FFFFFF</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>تقسيم العمل</h2>
+      <div class="sections">
+        <div class="sec">
+          <h3><span class="dot" style="background:var(--red);"></span> قسم المستخدم (المبلغ) — PWA</h3>
+          <p>الزر الأحمر الفوري، اختيار هوية الحالة، اختصاصات الحالة، محاكاة نفاذ وبطاقة NFC.</p>
+        </div>
+        <div class="sec">
+          <h3><span class="dot" style="background:var(--purple);"></span> قسم المسعف — Dashboard</h3>
+          <p>الموقع الحي، البروفايل الصحي للحالة، زبدة الذكاء الاصطناعي، وزر الاتصال بالمبلغ.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="note">
+      الملف النهائي للنموذج الأولي + مخطط قاعدة البيانات + الكود — جاهز للبناء عند كلمة «ابدأ».
+    </div>
+  </div>
+</body>
+</html>
