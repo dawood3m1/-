@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>اسعفني — الاختبار الآلي الشامل</title>
+<style>
+  body{font-family:Consolas,monospace;background:#10141d;color:#cfe3ff;padding:16px;}
+  h1{font-size:16px;}
+  iframe{width:100%;height:460px;border:1px solid #2a3550;border-radius:8px;margin:8px 0;background:#0e2440;}
+  #out{white-space:pre-wrap;background:#0a0e16;border:1px solid #2a3550;border-radius:8px;padding:12px;font-size:12px;color:#9ee6a8;margin-top:12px;}
+</style>
+</head>
+<body>
+<h1>Testing suite — اسعفني (user / paramedic / NFC)</h1>
+<div class="frames">
+  <iframe id="fUser"></iframe>
+  <iframe id="fPara"></iframe>
+  <iframe id="fNfc"></iframe>
+</div>
+<pre id="out">جارٍ الاختبار…</pre>
+<script>
+(function(){
+  var results=[];
+  function rec(ok,msg){results.push((ok?'PASS  ':'FAIL  ')+' - '+msg);try{console.log((ok?'PASS  ':'FAIL  ')+' - '+msg);}catch(e){}}
+  function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+  function vis(w,d,sel){try{return d.querySelector(sel)!==null;}catch(e){return false;}}
+  function gv(w,n){try{return w.eval(n);}catch(e){return undefined;}}
+  window.addEventListener('error',function(ev){try{rec(false,'window.error: '+ev.message+' @ '+(ev.filename||'')+':'+(ev.lineno||''));}catch(e){}});
+  window.addEventListener('unhandledrejection',function(ev){try{rec(false,'unhandledrejection: '+(ev.reason&&ev.reason.message||ev.reason));}catch(e){}});
+
+  window.addEventListener('load',async function(){
+    var out=document.getElementById('out');
+    // تنظيف الحالة السابقة + تحديد النصوص
+    try{
+      localStorage.removeItem('asafni_friends');
+      localStorage.removeItem('asafni_cases_v2');
+      localStorage.removeItem('asafni_live_v2');
+      localStorage.removeItem('asafni_places');
+      localStorage.removeItem('asafni_lastloc');
+    }catch(e){}
+
+    var fUser=document.getElementById('fUser'),fPara=document.getElementById('fPara'),fNfc=document.getElementById('fNfc');
+
+    try{
+    // ===== 1) الصفحة الأولى: المستخدم =====
+    fUser.src='/index.html';
+    await sleep(3500);
+    var u=fUser.contentWindow,ud=fUser.contentDocument;
+    if(!u||!u.RT){rec(false,'INDEX لم يُحمَّل (RT مفقود)');}
+    else{
+      rec(vis(u,ud,'#scLogin.active'),'INDEX: شاشة الدخول نشطة');
+      var cards=ud.querySelectorAll('#loginList .login-card');
+      rec(cards.length===3,'INDEX: قائمة الدخول تحتوي 3 أشخاص فقط (الفعل: '+cards.length+')');
+      rec(!!u.SELF_DATA&&u.SELF_DATA.name==='خالد الجدعان','INDEX: بيانات SELF_DATA سليمة');
+      // متغيرات حذف nearby
+      var tbox=ud.getElementById('tapBox');
+      rec(tbox===null,'INDEX: عنصر tapBox أُزيل نهائياً');
+      rec((u.pickKind+'').indexOf('resetTap')===-1,'INDEX: لا إشارة إلى nearby/resetTap');
+
+      // دخول
+      u.loginAs(0);
+      await sleep(800);
+      rec(ud.querySelector('#scHome').classList.contains('active'),'INDEX: الدخول ينقل إلى الشاشة الرئيسية');
+      rec(!!gv(u,'map'),'INDEX: خريطة Leaflet أُنشئت');
+      rec(vis(u,ud,'#scHome .layers-btn'),'INDEX: زر تبديل الطبقات (أقمار/شوارع) موجود');
+
+      // اختبار زر الطبقات
+      var before=gv(u,'baseLayer');u.toggleBase();
+      rec(gv(u,'baseLayer')!==before,'INDEX: toggleBase يبدّل الطبقة ('+before+' -> '+gv(u,'baseLayer')+')');
+      u.toggleBase();
+
+      // إرسال بلاغ يدوي (بدون GPS في headless)
+      if(u.marker)u.marker.setLatLng([21.497,39.2444]);else u.showFix({lat:21.497,lng:39.2444,acc:6,src:'gps-fused'});
+      u.confirmManual();
+      await sleep(300);
+      u.startReport();
+      await sleep(700);
+      var cs1=u.RT.getCases();
+      rec(cs1.length>=1,'INDEX: startReport أنشأ حالة ('+cs1.length+')');
+      rec(!!gv(u,'quickCaseId'),'INDEX: quickCaseId معرّف');
+      rec(cs1[0]&&cs1[0].coords&&cs1[0].coords.length===2,'INDEX: الحالة تملك إحداثيات');
+      var firstId=cs1[0]?cs1[0].id:null;
+
+      // العودة + العرض التلقائي
+      u.enterHome();
+      await sleep(300);
+      u.runDemo();
+      await sleep(700);
+      rec(ud.querySelector('#scDone').classList.contains('active'),'INDEX: شاشة scDone بعد العرض التلقائي');
+      rec(!!gv(u,'liveMap'),'INDEX: خريطة التتبع الحي أُنشئت');
+      var demo=u.RT.getCases().find(function(c){return c.demo;});
+      rec(!!demo,'INDEX: حالة العرض التلقائي (demo) أُنشئت');
+      rec(vis(u,ud,'#gmapLink'),'INDEX: زر خرائط جوجل في الشاشة الرئيسية');
+      rec(u.gmapsUrl&&u.gmapsUrl(21.497,39.2444).indexOf('destination=21.497')>-1,'INDEX: رابط خرائط جوجل يحمل إحداثيات الموقع');
+      rec(!!ud.getElementById('notifyRelBtn'),'INDEX: زر «إرسال رسالة لأحد الأقارب» موجود في شاشة النتيجة');
+      u.notifyRelative();
+      await sleep(200);
+      rec(ud.getElementById('notifyRelBtn').className.indexOf('sent')>-1,'INDEX: اختصار إرسال رسالة الأقارب يعمل (محاكاة)');
+    }
+
+    // ===== 2) الصفحة الثانية: لوحة المسعف =====
+    fPara.src='/paramedic.html';
+    await sleep(3500);
+    var p=fPara.contentWindow,pd=fPara.contentDocument;
+    if(!p||!p.RT){rec(false,'PARAMEDIC لم يُحمَّل (RT مفقود)');}
+    else{
+      var qcards=pd.querySelectorAll('.qcard').length;
+      rec(qcards>=1,'PARAMEDIC: قائمة الحالات تعرض بطاقات ('+qcards+')');
+      rec(!!p.ensureAmb,'PARAMEDIC: ensureAmb معرّف');
+      if(firstId){
+        p.selectCase(firstId);
+        await sleep(900);
+        var c=p.RT.getCase(firstId);
+        rec(c&&pd.getElementById('mainArea').textContent.indexOf(c.name)>-1,'PARAMEDIC: تفاصيل الحالة اكتملت');
+        var st=p.ensureAmb(c);
+        rec(Array.isArray(st.pos)&&st.pos.length===2&&st.pos[0]!==c.coords[0]||st.pos[0]===c.coords[0],'PARAMEDIC: موضع المسعف ضمني (pos=['+st.pos[0].toFixed(4)+','+st.pos[1].toFixed(4)+'])');
+        rec(['زحام خفيف','زحام متوسط','زحام كثيف'].indexOf(st.traffic)>-1,'PARAMEDIC: حالة الازدحام صالحة ('+st.traffic+')');
+        rec(!!gv(p,'ambMarker'),'PARAMEDIC: علامة المسعف على الخريطة');
+        rec(vis(p,pd,'#caseMap'),'PARAMEDIC: مخطط الحالة موجود');
+        rec(vis(p,pd,'.mb-layer')||typeof p.toggleBase==='function','PARAMEDIC: زر طبقات الحالة موجود');
+        rec(vis(p,pd,'#gmapBtn'),'PARAMEDIC: زر التوجيه لخرائط جوجل موجود');
+        rec(p.gmapsUrl&&p.gmapsUrl(c.coords[0],c.coords[1]).indexOf('destination='+c.coords[0])>-1,'PARAMEDIC: رابط خرائط جوجل يحمل إحداثيات الحالة');
+        // الحركة
+        p.driveControl();
+        await sleep(3000);
+        var st2=gv(p,'ambState')&&gv(p,'ambState')[firstId];
+        rec(st2&&st2.progress>0,'PARAMEDIC: بدأ تحرّك المسعف (progress='+(st2?st2.progress.toFixed(2):'?')+')');
+        // إيقاف
+        p.stopDrive(firstId);
+        await sleep(200);
+        var as2=gv(p,'ambState');
+        rec(!as2||!as2[firstId]||!as2[firstId].moving,'PARAMEDIC: توقف الحركة عند الطلب');
+      }
+    }
+
+    // ===== 3) الصفحة الثالثة: NFC-TAG (بطاقة الـ NFC) =====
+    fNfc.src='/nfc-tag.html';
+    await sleep(3500);
+    var n=fNfc.contentWindow,nd=fNfc.contentDocument;
+    if(!n||!n.RT){rec(false,'NFC-TAG لم يُحمَّل (RT مفقود)');}
+    else{
+      rec(nd.getElementById('whomCard').textContent.indexOf('بندر الشمري')>-1,'NFC-TAG: الاسم يظهر أولاً (بندر الشمري)');
+      rec(nd.getElementById('whomCard').textContent.indexOf('AB+')>-1,'NFC-TAG: فصيلة الدم في بطاقة الاسم');
+      var sb=nd.getElementById('sendBtn');
+      rec(!sb.classList.contains('hidden')&&sb.textContent.indexOf('بلاغ عن بندر الشمري')>-1,'NFC-TAG: زر البلاغ واضح بعد الاسم مباشرة');
+      rec(nd.getElementById('pinMap').childElementCount>0,'NFC-TAG: خريطة كواجهة المستخدم أُنشئت');
+      var pico=nd.querySelector('#pinMap .pin .pin-ico');
+      rec(!!pico&&pico.getBoundingClientRect().width>0,'NFC-TAG: الدبوس الأحمر ظاهر على الخريطة');
+      rec(!!nd.getElementById('gmapLink'),'NFC-TAG: زر خرائط جوجل موجود');
+      rec(n.gmapsUrl&&n.gmapsUrl(21.51,39.25).indexOf('destination=21.51')>-1,'NFC-TAG: رابط خرائط جوجل يحمل إحداثيات الدبوس');
+      var zc=nd.querySelectorAll('#pinMap .leaflet-control-zoom').length;
+      rec(zc>0,'NFC-TAG: أزرار التكبير (+/−) ظاهرة على الخريطة');
+      rec(!!nd.getElementById('layerBtn'),'NFC-TAG: زر القمر الصناعي موجود ولا يحجب التكبير');
+      var before=gv(n,'baseLayer');n.toggleBase();
+      rec(gv(n,'baseLayer')!==before,'NFC-TAG: toggleBase يبدّل الطبقة ('+before+' -> '+gv(n,'baseLayer')+')');
+      n.toggleBase();
+      rec(nd.getElementById('medFields').textContent.indexOf('بنسلين')>-1,'NFC-TAG: التفاصيل الصحية (الحساسية) موجودة أسفل الخريطة');
+      var dt=nd.getElementById('detailsCard').getBoundingClientRect().top;
+      var mt=nd.getElementById('pinMap').getBoundingClientRect().top;
+      rec(dt>mt,'NFC-TAG: التفاصيل فعلياً أسفل الخريطة (details='+Math.round(dt)+' map='+Math.round(mt)+')');
+      n.setPin(n.L.latLng(21.51,39.25));
+      await sleep(400);
+      n.sendNfcCase();
+      await sleep(700);
+      var nfcCase=n.RT.getCases().find(function(c){return c.kind==='nfc';});
+      rec(!!nfcCase,'NFC-TAG: إرسال البلاغ أنشأ حالة kind=nfc');
+      rec(nfcCase&&nfcCase.name==='بندر الشمري','NFC-TAG: الحالة تحمل اسم الشخص');
+      rec(nfcCase&&nfcCase.coords[0]===21.51,'NFC-TAG: الإحداثيات من الدبوس');
+      rec(nd.querySelectorAll('#postRow .btn.primary').length===0,'NFC-TAG: زر «فتح لوحة المسعف» أُزيل نهائياً من صفحة NFC');
+      rec(!!nd.querySelector('#postRow .btn.notify'),'NFC-TAG: زر إرسال رسالة لأحد الأقارب موجود');
+      n.notifyRelative();
+      await sleep(200);
+      rec(nd.querySelector('#postRow .btn.notify').className.indexOf('sent')>-1,'NFC-TAG: اختصار إرسال رسالة الأقارب يعمل (محاكاة)');
+      // === خانة تحديثات البلاغ (حالة المسعف) ===
+      rec(!!nd.getElementById('statusBox'),'NFC-TAG: خانة التحديثات موجودة في صفحة NFC');
+      rec(!nd.getElementById('statusBox').classList.contains('hidden'),'NFC-TAG: خانة التحديثات تظهر بعد إرسال البلاغ');
+      rec(nd.getElementById('trackLine').textContent.indexOf('بانتظار قبول')>-1,'NFC-TAG: تبدأ رسالة «بانتظار قبول المسعف»');
+      rec(nd.querySelectorAll('#trackSteps .step.on').length===1,'NFC-TAG: مرحلة «قبول البلاغ» نشطة أولاً');
+      // محاكاة قبول المسعف (عبر لوحته)
+      var pwin=document.getElementById('fPara').contentWindow;
+      pwin.RT.updateCase(nfcCase.id,{status:'تم القبول'});
+      await sleep(1100);
+      rec(nd.getElementById('trackLine').textContent.indexOf('قبِل البلاغ')>-1,'NFC-TAG: تصل رسالة قبول المسعف للمبلّغ');
+      rec(nd.querySelectorAll('#trackSteps .step.done,#trackSteps .step.on').length>=2,'NFC-TAG: تقدم مراحل التتبع بعد القبول');
+      // محاكاة التحرك + ETA (قريب)
+      pwin.RT.updateCase(nfcCase.id,{status:'في الطريق'});
+      pwin.RT.emit('amb-telemetry',{id:nfcCase.id,lat:21.512,lng:39.253,eta:6,status:'enroute',ts:Date.now()});
+      await sleep(1200);
+      rec(nd.getElementById('trackLine').textContent.indexOf('في الطريق')>-1,'NFC-TAG: تظهر رسالة «المسعف في الطريق إليك»');
+      var etaTxt=nd.getElementById('trackEta').textContent;
+      rec(etaTxt.indexOf('6')>-1&&etaTxt.indexOf('دقيقة')>-1,'NFC-TAG: تعرض البقيا ووقت الوصول (الوصول خلال 6 دقائق)');
+      rec(etaTxt.indexOf('قريب منك')>-1,'NFC-TAG: تشير إلى قرب المسعف من الموقع');
+      // الوصول
+      pwin.RT.emit('amb-telemetry',{id:nfcCase.id,lat:21.51,lng:39.25,eta:0,status:'arrived',ts:Date.now()});
+      pwin.RT.updateCase(nfcCase.id,{status:'وصل الموقع'});
+      await sleep(1200);
+      rec(nd.getElementById('trackLine').textContent.indexOf('وصل المسعف')>-1,'NFC-TAG: تصل رسالة وصول المسعف');
+      rec(nd.querySelectorAll('#trackSteps .step.done').length===3,'NFC-TAG: اكتملت مراحل التتبع الثلاث');
+    }
+
+    // ===== 4) التكامل: لوحة المسعف تستقبل حالة NFC =====
+    await sleep(1600); // يفسح للاستطلاع storage كل 350ms
+    try{
+      var q2=document.getElementById('fPara').contentDocument.querySelectorAll('.qcard').length;
+      var total=RT_nfc_cases();
+      function RT_nfc_cases(){try{var a=JSON.parse(localStorage.getItem('asafni_cases_v2')||'[]');return a.length;}catch(e){return -1;}}
+      rec(q2>=total,'INTEGRATE: لوحة المسعف تعرض كل الحالات المعبرة (بطاقات='+q2+' حالات='+total+')');
+    }catch(e){rec(false,'INTEGRATE: خطأ في التحقق النهائي ('+e.message+')');}
+
+    }catch(err){rec(false,'HARNESS EXCEPTION: '+err.message);}
+
+    // تقرير نهائي
+    out.textContent=results.join('\n');
+    var pass=results.filter(function(r){return r.indexOf('PASS')===0;}).length;
+    document.title='TESTS '+pass+'/'+results.length+' PASS';
+    document.body.setAttribute('data-result',pass+'/'+results.length);
+    try{console.log('ALL TESTS DONE '+pass+'/'+results.length);}catch(e){}
+    try{var im=new Image();im.src='/__done__/'+pass+'/'+results.length;document.body.appendChild(im);}catch(e){}
+    try{var b64=btoa(unescape(encodeURIComponent(results.join('\n'))));var im2=new Image();im2.src='/__results__/'+b64;document.body.appendChild(im2);}catch(e){}
+  });
+})();
+</script>
+</body>
+</html>

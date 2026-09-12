@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>اسعفني — بطاقة إسعافية NFC</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap');
+  :root{
+    --font:'Tajawal','Segoe UI',Tahoma,Arial,sans-serif;
+    --font-mono:'JetBrains Mono','SF Mono',Consolas,monospace;
+    --b1:#2557C7;--b2:#15316E;--b3:#081227;
+    --red:#DC1B30;--red2:#F0454F;
+    --accent:#3E8EF7;--accent2:#6FB1FF;
+    --ok:#3DDC84;--okbg:rgba(61,220,132,.12);
+    --warn:#F0A63E;--warn2:#FFC876;--warnbg:rgba(240,166,62,.12);
+    --text:#FFFFFF;--muted:rgba(255,255,255,.68);--line:rgba(140,180,255,.14);
+    --card:rgba(255,255,255,.06);--chip:rgba(8,20,45,.9);--input:rgba(0,0,0,.24);
+    --shadow:0 18px 44px rgba(4,10,25,.5);--glow2:0 16px 36px rgba(37,87,199,.4);
+    --glow-red:0 16px 32px rgba(220,27,48,.42);
+  }
+  :root[data-theme="light"]{
+    --b1:#FFFFFF;--b2:#EAF1FC;--b3:#D3E3F8;
+    --text:#142A52;--muted:#55698A;--line:rgba(20,70,140,.14);
+    --card:rgba(255,255,255,.9);--chip:rgba(255,255,255,.95);--input:#FFFFFF;
+    --ok:#0E9C58;--warnbg:rgba(240,166,62,.16);--shadow:0 18px 40px rgba(40,80,150,.14);--glow2:0 16px 32px rgba(37,87,199,.26);
+    --glow-red:0 16px 30px rgba(220,27,48,.28);
+    --accent:#2F6FE0;--accent2:#5B93F2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  .ic{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.15em;}
+  body{font-family:var(--font);color:var(--text);background:radial-gradient(130% 90% at 15% 0%,var(--b1),var(--b2) 55%,var(--b3));min-height:100vh;}
+  .app{max-width:430px;margin:0 auto;padding:18px 16px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px;}
+  .top{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);}
+  .top .logo{width:46px;height:46px;border-radius:13px;background:linear-gradient(160deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;flex:none;}
+  .top .logo .ic{width:24px;height:24px;}
+  .top h1{font-size:18px;font-weight:900;}
+  .top .sub{font-size:11px;color:var(--muted);}
+
+  .whom{
+    display:flex;align-items:center;gap:14px;padding:16px;
+    background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);
+  }
+  .blood-badge{width:70px;height:70px;flex:none;border-radius:50%;background:rgba(62,142,247,.14);border:2px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:18px;font-weight:800;font-family:var(--font-mono);color:#9CC4FF;}
+  .blood-badge small{font-size:8.5px;font-weight:700;color:var(--muted);font-family:var(--font);}
+  .whom .who{min-width:0;}
+  .whom .tag-label{font-size:10.5px;font-weight:800;color:var(--accent2);display:flex;align-items:center;gap:5px;margin-bottom:2px;}
+  .whom .tag-label .ic{width:12px;height:12px;}
+  .whom .pname{font-size:22px;font-weight:900;line-height:1.25;}
+  .whom .prel{font-size:11.5px;color:var(--muted);font-weight:700;margin-top:3px;}
+  .whom.feature{background:linear-gradient(160deg,rgba(62,142,247,.2),rgba(62,142,247,.05));border-color:rgba(62,142,247,.45);}
+
+  .report-btn{
+    width:100%;border:none;cursor:pointer;font-family:inherit;color:#fff;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    padding:18px 18px;border-radius:18px;
+    font-size:17px;font-weight:900;letter-spacing:.01em;
+    background:linear-gradient(160deg,var(--red2),var(--red));
+    box-shadow:var(--glow-red);transition:transform .08s,opacity .2s;
+  }
+  .report-btn:active{transform:scale(.97);}
+  .report-btn .ic{width:22px;height:22px;}
+  .report-btn small{display:block;font-size:10.5px;font-weight:700;opacity:.85;margin-top:2px;letter-spacing:0;}
+  .report-btn:disabled{opacity:.65;cursor:default;}
+
+  .map-card{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:#0E2440;}
+  #pinMap{width:100%;height:280px;}
+  .map-status{
+    position:absolute;top:10px;right:10px;z-index:1000;
+    max-width:calc(100% - 140px);white-space:normal;line-height:1.5;
+    display:flex;align-items:center;gap:5px;
+    font-size:11px;font-weight:800;padding:6px 12px;border-radius:999px;
+    background:var(--chip);border:1px solid var(--line);color:var(--text);backdrop-filter:blur(6px);
+  }
+  .map-status.ready{color:var(--ok);background:var(--okbg);border-color:transparent;}
+  .map-status.warn{color:#FFB547;background:rgba(240,166,62,.14);border-color:rgba(240,166,62,.4);}
+  .map-hint{
+    position:absolute;bottom:10px;right:10px;z-index:1000;
+    max-width:calc(100% - 140px);
+    font-size:9.5px;font-weight:700;color:var(--muted);padding:4px 10px;border-radius:999px;
+    background:var(--chip);border:1px solid var(--line);
+  }
+  .map-fix{
+    position:absolute;top:48px;right:10px;z-index:1000;
+    padding:6px 11px;border-radius:999px;font-size:11px;font-weight:800;
+    background:var(--chip);border:1px solid var(--line);color:var(--text);
+    backdrop-filter:blur(6px);font-family:inherit;cursor:pointer;transition:.12s;
+  }
+  .map-fix.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .map-fix.alt{top:92px;background:rgba(62,142,247,.16);border-color:var(--accent);color:var(--accent2);}
+  .layers-btn{
+    position:absolute;left:10px;top:84px;z-index:1000;
+    display:flex;align-items:center;gap:6px;
+    padding:6px 11px;border-radius:999px;font-size:11px;font-weight:800;
+    background:var(--chip);border:1px solid var(--line);color:var(--text);
+    backdrop-filter:blur(6px);font-family:inherit;cursor:pointer;transition:.12s;
+  }
+  .layers-btn .ic{width:12px;height:12px;}
+  .manual-panel{
+    display:none;position:absolute;left:10px;right:10px;bottom:10px;z-index:1000;
+    background:var(--chip);border:1px solid var(--accent);border-radius:14px;padding:11px;backdrop-filter:blur(8px);
+  }
+  .manual-panel.show{display:block;}
+  .manual-panel p{font-size:11.5px;margin-bottom:8px;color:var(--muted);text-align:center;font-weight:700;}
+  .manual-panel .row{display:flex;gap:8px;}
+  .manual-panel .row button{flex:1;padding:9px;border-radius:10px;font-size:12px;font-weight:800;border:none;cursor:pointer;color:#fff;font-family:inherit;}
+  .manual-panel .ok{background:linear-gradient(160deg,var(--accent2),var(--accent));}
+  .manual-panel .cancel{background:transparent;border:1px solid var(--line);color:var(--muted);}
+  .dot-live{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:blink 1.2s infinite;flex:none;}
+  @keyframes blink{50%{opacity:.25}}
+  .loc-line{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;padding:4px 2px;}
+  .loc-line .ic{width:14px;height:14px;color:var(--accent2);flex:none;}
+  .loc-line b{color:var(--ok);font-weight:800;}
+
+  .details{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;}
+  .details .dh{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:900;padding:14px 16px 4px;}
+  .details .dh .ic{width:16px;height:16px;color:var(--accent2);}
+  .details .fields{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:12px 16px 16px;}
+  .field{background:var(--input);border:1px solid var(--line);border-radius:11px;padding:9px 11px;}
+  .field.wide{grid-column:1/-1;}
+  .field span{display:block;font-size:10px;color:var(--muted);font-weight:700;margin-bottom:2px;}
+  .field b{font-size:12.5px;font-weight:800;}
+  .field.flag{border-color:rgba(240,166,62,.4);background:var(--warnbg);}
+
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .btn{border:none;border-radius:14px;padding:14px 16px;font-size:13.5px;font-weight:800;color:#fff;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .btn.primary{background:linear-gradient(160deg,var(--accent2),var(--accent));box-shadow:var(--glow2);}
+  .btn.ghost{background:var(--input);color:var(--text);border:1px solid var(--line);box-shadow:none;}
+  .btn.notify{background:rgba(62,142,247,.12);color:var(--accent2);border:1px solid var(--accent);box-shadow:none;}
+  .btn.notify.sent{background:var(--okbg);color:var(--ok);border-color:rgba(61,220,132,.35);}
+  .btn:disabled{opacity:.75;cursor:default;}
+
+  .status-box{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:14px 16px;}
+  .status-box .sb-head{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:900;color:var(--muted);margin-bottom:10px;}
+  .status-box .sb-head .ic{width:15px;height:15px;color:var(--accent2);}
+  .status-box .sb-head .dot-live{width:6px;height:6px;}
+  .track-line{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:900;background:var(--input);border:1px solid var(--line);border-radius:12px;padding:11px 13px;line-height:1.5;}
+  .track-line .dot-live{flex:none;}
+  .track-line .ic{width:16px;height:16px;flex:none;}
+  .track-line.ok{color:var(--ok);background:var(--okbg);border-color:rgba(61,220,132,.35);}
+  .track-line.go{color:var(--accent2);background:rgba(62,142,247,.12);border-color:var(--accent);}
+  .track-line.done{color:#A8F2CC;background:linear-gradient(160deg,rgba(61,220,132,.18),rgba(61,220,132,.08));border-color:rgba(61,220,132,.45);}
+  .track-eta{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .track-eta .chip{flex:1;min-width:110px;background:var(--input);border:1px solid var(--line);border-radius:11px;padding:8px 11px;font-size:11px;font-weight:800;display:flex;align-items:center;gap:6px;color:var(--muted);}
+  .track-eta .chip .ic{width:13px;height:13px;color:var(--accent2);flex:none;}
+  .track-eta .chip b{font-family:var(--font-mono);font-size:11.5px;color:var(--accent2);}
+  .track-eta .chip.near{color:var(--ok);border-color:rgba(61,220,132,.35);background:var(--okbg);}
+  .track-eta .chip.near .ic{color:var(--ok);}
+  .track-eta .chip.near b{color:var(--ok);}
+  .steps{display:flex;align-items:flex-start;gap:6px;margin-top:10px;}
+  .steps .step{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;}
+  .steps .step .dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);background:var(--input);display:flex;align-items:center;justify-content:center;color:transparent;transition:.25s;}
+  .steps .step .dot .ic{width:11px;height:11px;}
+  .steps .step.on .dot{border-color:var(--accent);background:var(--accent);color:#fff;box-shadow:0 0 0 4px rgba(62,142,247,.15);}
+  .steps .step.done .dot{border-color:var(--ok);background:var(--ok);color:#fff;}
+  .steps .step small{font-size:9.5px;color:var(--muted);font-weight:800;line-height:1.4;}
+  .steps .step.on small{color:#fff;}
+  .steps .step.done small{color:var(--ok);}
+  .steps .join{flex:0 0 auto;width:16px;height:2px;border-radius:2px;background:var(--line);margin-top:9px;transition:.25s;}
+  .steps .join.done{background:var(--ok);}
+
+  .foot{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;color:var(--muted);padding:4px 12px;line-height:1.7;}
+  .foot .ic{flex:none;color:var(--accent2);}
+
+  .pin{filter:drop-shadow(0 4px 6px rgba(0,0,0,.45));}
+  .pin-ico{width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:linear-gradient(160deg,var(--red2),var(--red));border:3px solid #fff;display:flex;align-items:center;justify-content:center;}
+  .pin-ico::after{content:'';width:9px;height:9px;border-radius:50%;background:#fff;transform:rotate(45deg);}
+
+  .gmap-link{
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    padding:14px 16px;border-radius:14px;
+    font-size:13.5px;font-weight:900;font-family:inherit;color:#fff;
+    background:linear-gradient(160deg,#4FAA5A,#34A853);
+    box-shadow:0 14px 30px rgba(52,168,83,.28);
+    text-decoration:none;transition:.12s;cursor:pointer;
+  }
+  .gmap-link:active{transform:scale(.97);}
+  .gmap-link .ic{width:18px;height:18px;}
+
+  .hidden{display:none!important;}
+  .snack{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;z-index:2000;background:var(--chip);border:1px solid var(--accent);color:var(--text);padding:11px 18px;border-radius:14px;font-size:12.5px;font-weight:800;text-align:center;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.25s;max-width:90vw;}
+  .snack.show{opacity:1}
+  .snack small{display:block;color:var(--muted);font-size:10px;font-weight:700;margin-top:3px;}
+  .leaflet-control-attribution{display:none;}
+</style>
+</head>
+<body>
+<svg class="sprites" style="display:none" aria-hidden="true">
+  <symbol id="i-nfc" viewBox="0 0 24 24"><path d="M5 8a8 8 0 0 1 0 8"/><path d="M9 5.5a11.6 11.6 0 0 1 0 13"/><circle cx="16.5" cy="12" r="2.2"/></symbol>
+  <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.3"/><path d="M8 12.3l2.7 2.7 5.3-5.6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21.5S5 15 5 9.8a7 7 0 1 1 14 0c0 5.2-7 11.7-7 11.7z"/><circle cx="12" cy="9.6" r="2.4"/></symbol>
+  <symbol id="i-pin-edit" viewBox="0 0 24 24"><path d="M12 21.5S5 15 5 9.8a7 7 0 1 1 14 0c0 5.2-7 11.7-7 11.7z"/><path d="M9.6 10.2l1.6 1.6 3-3"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9.5 5.5 4.5 10l5 4.5"/><path d="M4.5 10h9.8a5.2 5.2 0 0 1 0 10.4H8.5"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3 2.5 8 12 13l9.5-5z"/><path d="M2.5 12 12 17l9.5-5"/><path d="M2.5 16.2 12 21.2l9.5-5.3" opacity=".45"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".2" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M3.5 12 20.5 4 13 20.5l-2.3-6.7L3.5 12z"/><path d="M10.7 13.8 20.5 4"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4.3c.4-.9 1.3-1.5 2.3-1.3l2.4.4c.8.1 1.4.7 1.6 1.4l.7 2.6c.2.7 0 1.5-.6 2l-1.6 1.4c1 2.5 3 4.6 5.6 5.6l1.4-1.6c.5-.6 1.3-.8 2-.6l2.6.7c.8.2 1.3.9 1.4 1.6l.4 2.4c.2 1-.4 1.9-1.3 2.3-1 .4-2 .6-3 .5-8-.7-14.4-7-15.1-15-.1-1 .1-2.1.5-3z"/></symbol>
+  <symbol id="i-friends" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M3 20c1.2-3.7 3.5-5.5 6-5.5s4.8 1.8 6 5.5"/><path d="M17.9 7.2h-2.3"/><path d="M16.7 6v2.4"/><path d="M18.6 12.6c.9-.8 2.1.1 2.1 1.2 0 1.3-2.1 3-2.1 3s-2.1-1.7-2.1-3c0-1.1 1.2-2 2.1-1.2z" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9.5h12V10"/><path d="M10 19.5v-5h4v5"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4.3" width="14" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3.4" rx="1"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4.5"/></symbol>
+</svg>
+
+<div class="app">
+  <div class="top">
+    <div class="logo"><svg class="ic"><use href="#i-nfc"/></svg></div>
+    <div>
+      <h1>اسعفني — بطاقة إسعافية</h1>
+      <div class="sub">تبليغ مباشر عن صاحب بطاقة الـ NFC</div>
+    </div>
+  </div>
+
+  <div class="whom feature" id="whomCard"></div>
+
+  <button class="report-btn hidden" id="sendBtn" onclick="sendNfcCase()">
+    <svg class="ic"><use href="#i-send"/></svg>
+    <span id="sendBtnTxt">بلاغ عن بندر الشمري</span>
+  </button>
+
+  <div class="btn-row hidden" id="postRow">
+    <button class="btn notify" onclick="notifyRelative()"><svg class="ic"><use href="#i-friends"/></svg> إرسال رسالة لأحد الأقارب</button>
+    <button class="btn ghost" onclick="resetNfc()"><svg class="ic"><use href="#i-check-circle"/></svg> بلاغ جديد</button>
+  </div>
+
+  <div class="status-box hidden" id="statusBox">
+    <div class="sb-head"><span class="dot-live"></span> تحديثات البلاغ — مباشر</div>
+    <div class="track-line wait" id="trackLine"><span class="dot-live"></span> بانتظار قبول المسعف…</div>
+    <div class="track-eta" id="trackEta"></div>
+    <div class="steps" id="trackSteps"></div>
+  </div>
+
+  <div class="map-card">
+    <div id="pinMap"></div>
+    <div class="map-status wait" id="mapStatus"><span class="dot-live"></span> بانتظار إذن الموقع…</div>
+    <div class="map-hint" id="mapHint">جارٍ التحديد عالي الدقة</div>
+    <button class="map-fix" id="manualBtn" onclick="toggleManual()"><svg class="ic"><use href="#i-pin-edit"/></svg> تعديل الموقع</button>
+    <button class="map-fix alt" id="undoBtn" onclick="undoManual()" style="display:none"><svg class="ic"><use href="#i-undo"/></svg> الرجوع لموقعي</button>
+    <button class="layers-btn" id="layerBtn" onclick="toggleBase()"><svg class="ic"><use href="#i-layers"/></svg> أقمار صناعية</button>
+    <div class="manual-panel" id="manualPanel">
+      <p>اسحب الدبوس إلى مدخل موقع الحالة ثم أكّد</p>
+      <div class="row">
+        <button class="cancel" onclick="toggleManual()">إلغاء</button>
+        <button class="ok" onclick="confirmManual()">تأكيد الموقع من هنا</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loc-line" id="locLine"><svg class="ic"><use href="#i-target"/></svg> الموقع <b id="locTxt">بانتظار الإذن…</b></div>
+
+  <a class="gmap-link" id="gmapLink" target="_blank" rel="noopener" onclick="openGmaps()"><svg class="ic"><use href="#i-target"/></svg> فتح الموقع في خرائط جوجل</a>
+
+  <div class="details" id="detailsCard">
+    <div class="dh"><svg class="ic"><use href="#i-clipboard"/></svg> السجل الصحي — وصل للمسعف مع البلاغ</div>
+    <div class="fields" id="medFields"></div>
+  </div>
+
+  <div class="foot">
+    <svg class="ic"><use href="#i-nfc"/></svg>
+    <span>أُثبت هذا الرابط على بطاقة الـ NFC نفسها — أي تقريب للبطاقة من أي جهاز يفتح صفحة التبليغ مباشرة لصاحب البطاقة.</span>
+  </div>
+</div>
+
+<div class="snack" id="snack"></div>
+
+<script src="scenarios.js"></script>
+<script src="firebase-config.js"></script>
+<script src="realtime.js"></script>
+<script>
+const TAG_PERSON={
+  app:'asafni',tag:'tag',
+  relation:'صاحب البطاقة الإسعافية',
+  name:'بندر الشمري',
+  age:'41',
+  blood:'AB+',
+  allergy:'بنسلين',
+  drugs:'ميتفورمين 500مغ (سكري)',
+  ops:'استئصال المرارة (2018)',
+  chronic:'سكري نوع 2'
+};
+
+let currentProfile=null,pinMap=null,pinMarker=null,accCircle=null,currentCoords=null;
+let baseLayer='street',manual=false,locked=false,gotFix=false;
+let lastNfcCaseId=null,lastTelemetry=null;
+
+const PIN_EDIT_ICON='<svg class="ic"><use href="#i-pin-edit"/></svg> تعديل الموقع';
+const PIN_EDITING_ICON='<svg class="ic"><use href="#i-pin-edit"/></svg> جارٍ التعديل…';
+
+function toast(msg,sub){const s=document.getElementById('snack');s.innerHTML=msg+(sub?'<small>'+sub+'</small>':'');s.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>s.classList.remove('show'),2800);}
+
+function setMapStatus(ok,txt,cls){const el=document.getElementById('mapStatus');if(!el)return;el.className='map-status '+(cls||(ok?'ready':'wait'));el.innerHTML='<span class="dot-live"></span> '+txt;}
+function setLocLine(txt){const b=document.getElementById('locTxt');if(b)b.textContent=txt;}
+
+function renderWhom(){
+  const p=TAG_PERSON,elm=document.getElementById('whomCard');
+  elm.classList.remove('feature');
+  elm.innerHTML=`
+    <div class="blood-badge">${p.blood||'—'}<small>فصيلة</small></div>
+    <div class="who">
+      <div class="tag-label"><svg class="ic"><use href="#i-nfc"/></svg> صاحب البطاقة — يفتح هذا البلاغ باسمه</div>
+      <div class="pname">${p.name||'—'}</div>
+      <div class="prel">${p.relation||'بطاقة NFC'} · ${p.age||'—'} سنة</div>
+    </div>`;
+}
+function renderMed(){
+  const p=TAG_PERSON;
+  const flag=p.allergy&&!['لا','لا يوجد','—'].includes(p.allergy);
+  document.getElementById('medFields').innerHTML=`
+    <div class="field ${flag?'flag':''}"><span>الحساسية</span><b>${p.allergy||'لا يوجد'}</b></div>
+    <div class="field"><span>الأدوية</span><b>${p.drugs||'لا يوجد'}</b></div>
+    <div class="field wide"><span>الأمراض المزمنة</span><b>${p.chronic||'لا يوجد'}</b></div>
+    <div class="field wide"><span>آخر عملية</span><b>${p.ops||'لا يوجد'}</b></div>`;
+}
+
+function tileUrl(){return baseLayer==='street'?'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png':'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';}
+function toggleBase(){
+  if(!pinMap)return;
+  baseLayer=baseLayer==='street'?'satellite':'street';
+  pinMap.eachLayer(l=>{if(l instanceof L.TileLayer)pinMap.removeLayer(l);});
+  L.tileLayer(tileUrl(),{attribution:'© OSM · Esri · CARTO'}).addTo(pinMap);
+  const b=document.getElementById('layerBtn');if(b)b.innerHTML='<svg class="ic"><use href="#i-layers"/></svg> '+(baseLayer==='street'?'أقمار صناعية':'شوارع');
+}
+
+function initPinMap(){
+  if(pinMap){pinMap.remove();pinMap=null;pinMarker=null;accCircle=null;}
+  const center=currentCoords||[21.496964,39.244428];
+  pinMap=L.map('pinMap',{zoomControl:true,attributionControl:false}).setView(center,15);
+  L.tileLayer(tileUrl(),{attribution:'© OSM © CARTO'}).addTo(pinMap);
+  const icon=L.divIcon({className:'pin',html:'<div class="pin-ico"></div>',iconSize:[30,30],iconAnchor:[15,28]});
+  pinMarker=L.marker(center,{icon,draggable:true}).addTo(pinMap);
+  accCircle=L.circle(center,{radius:25,color:'#3DDC84',weight:1.5,fillColor:'#3DDC84',fillOpacity:.12}).addTo(pinMap);
+  pinMarker.on('drag',()=>{if(manual){setMapStatus(true,'اسحب الدبوس إلى موقع الحالة','warn');}});
+  pinMarker.on('dragend',()=>{if(manual){const p=pinMarker.getLatLng();setPin(L.latLng(p.lat,p.lng));}});
+  pinMap.on('click',e=>{if(manual){pinMarker.setLatLng(e.latlng);setPin(e.latlng);}});
+  setLocLine('بانتظار الإذن…');
+}
+
+function setPin(ll){
+  currentCoords=[ll.lat,ll.lng];
+  fetchAddr(ll.lat,ll.lng).then(a=>{
+    const el=document.getElementById('mapHint');if(el)el.textContent=a||'جرى تحديد الموقع…';
+  });
+  if(pinMap&&pinMap.setView)pinMap.setView(ll,Math.max(pinMap.getZoom(),15));
+}
+
+function useLiveFix(){
+  if(locked||manual)return;
+  if(!navigator.geolocation){setMapStatus(false,'الموقع غير مدعوم');setLocLine('غير مدعوم');return;}
+  setMapStatus(false,'جارٍ جلب موقعك بدقة…');
+  const watchId=navigator.geolocation.watchPosition(pos=>{
+    if(locked||manual)return;
+    const c=pos.coords,acc=c.accuracy==null?9999:c.accuracy;
+    applyFix(c.latitude,c.longitude,acc,'gps');
+    if(navigator.geolocation.clearWatch)try{navigator.geolocation.clearWatch(watchId);}catch(_){}
+  },err=>{
+    if(err.code===1){setMapStatus(false,'اسمح بالوصول للموقع','warn');document.getElementById('mapHint').textContent='اسمح بالموقع ثم بلّغ — أو اسحب الدبوس';}
+    else setMapStatus(false,'تعذّر GPS — استخدم الدبوس','warn');
+    setLocLine('تعذّر GPS');
+    fallbackFix();
+  },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
+}
+function fallbackFix(){
+  if(currentCoords)return;
+  let lk=null;try{lk=JSON.parse(localStorage.getItem('asafni_lastloc')||'null');}catch(_){}
+  if(lk){applyFix(lk.lat,lk.lng,lk.acc||'—','last');setLocLine('آخر موقع معروف');return;}
+  applyFix(21.496964,39.244428,150,'default');setLocLine('موقع المدينة الافتراضي');
+}
+
+function applyFix(lat,lng,acc,src){
+  currentCoords=[lat,lng];
+  if(pinMarker)pinMarker.setLatLng([lat,lng]);
+  if(accCircle)accCircle.setLatLng([lat,lng]).setRadius(Math.max(Number(acc)||6,6));
+  const st={a:acc<=15?'تم تحديد موقعك بدقة':acc<=80?'تم تحديد موقعك تقريباً':'موقع تقريبي'};
+  setMapStatus(true,st.a,'ready');
+  setLocLine(src==='manual'?'يدوي — مدخل الموقع':st.a);
+  setPin(L.latLng(lat,lng));
+  gotFix=true;
+}
+
+function toggleManual(){
+  manual=!manual;
+  const panel=document.getElementById('manualPanel'),b=document.getElementById('manualBtn'),u=document.getElementById('undoBtn');
+  if(manual){
+    panel.classList.add('show');b.classList.add('on');b.innerHTML=PIN_EDITING_ICON;
+    if(pinMarker&&pinMarker.dragging)pinMarker.dragging.enable();
+    setMapStatus(true,'اسحب الدبوس إلى موقع الحالة','warn');
+    if(u)u.style.display='none';
+  }else{
+    panel.classList.remove('show');b.classList.remove('on');b.innerHTML=PIN_EDIT_ICON;
+    if(pinMarker&&pinMarker.dragging)pinMarker.dragging.disable();
+    if(u)u.style.display='none';
+    setMapStatus(false,'تلقائي — متابعة حية');
+  }
+}
+
+function confirmManual(){
+  if(!pinMarker)return;
+  const p=pinMarker.getLatLng();
+  manual=false;locked=true;
+  document.getElementById('manualPanel').classList.remove('show');
+  const b=document.getElementById('manualBtn');b.classList.remove('on');b.innerHTML=PIN_EDIT_ICON;
+  const u=document.getElementById('undoBtn');if(u)u.style.display='flex';
+  if(pinMarker.dragging)pinMarker.dragging.disable();
+  applyFix(p.lat,p.lng,5,'manual');
+  setMapStatus(true,'موقع يدوي — جاهز','ready');
+  toast('تم تثبيت الموقع على الدبوس — أرسل البلاغ الآن');
+}
+
+function undoManual(){
+  manual=false;locked=false;
+  document.getElementById('manualPanel').classList.remove('show');
+  const b=document.getElementById('manualBtn');if(b){b.classList.remove('on');b.innerHTML=PIN_EDIT_ICON;}
+  const u=document.getElementById('undoBtn');if(u)u.style.display='none';
+  if(pinMarker&&pinMarker.dragging)pinMarker.dragging.disable();
+  setMapStatus(false,'متابعة حية — جارٍ جلب موقعك…');
+  setLocLine('تحديد الموقع تلقائياً…');
+  useLiveFix();
+  toast('عُدنا للتحديد التلقائي — جارٍ جلب موقعك الحالي');
+}
+
+function fetchAddr(lat,lng){
+  if(!navigator.onLine)return Promise.resolve('');
+  return fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&accept-language=ar&lat='+lat+'&lon='+lng)
+    .then(r=>r.json()).then(j=>(j.display_name||'').split(',').slice(0,3).join('،')).catch(()=>'');
+}
+
+function gmapsUrl(lat,lng){return 'https://www.google.com/maps/dir/?api=1&destination='+lat.toFixed(6)+','+lng.toFixed(6)+'&travelmode=driving';}
+function openGmaps(){
+  if(!currentCoords){toast('حدد الموقع أولاً — اسحب الدبوس أو انتظر GPS');return;}
+  window.open(gmapsUrl(currentCoords[0],currentCoords[1]),'_blank','noopener');
+}
+
+function sendNfcCase(){
+  const p=TAG_PERSON;
+  if(!currentCoords){toast('حدد الموقع أولاً — اسحب الدبوس أو انتظر GPS');return;}
+  const b=document.getElementById('sendBtn');
+  b.disabled=true;
+  b.innerHTML='<svg class="ic"><use href="#i-send"/></svg> جارٍ إرسال بلاغ '+p.name+'…';
+  const c={
+    id:'c'+Date.now(),ts:Date.now(),kind:'nfc',
+    name:p.name||'غير معروف',age:p.age||'—',
+    blood:p.blood||'—',allergy:p.allergy||'لا يوجد',drugs:p.drugs||'لا يوجد',ops:p.ops||'لا يوجد',chronic:p.chronic||'لا يوجد',
+    relation:p.relation||'صاحب بطاقة NFC',reporter:'بلاغ مباشر من بطاقة الـ NFC',
+    conds:['حالة أخرى'],desc:'بلاغ فوري بفتح صفحة بطاقة الـ NFC',
+    priority:'stable',
+    coords:[currentCoords[0],currentCoords[1]],
+    acc:6,posSrc:'gps',status:'جديد',addrTxt:(document.getElementById('mapHint').textContent||'').replace(/^…$/,'')
+  };
+  RT.addCase(c);
+  showTrack(c.id);
+  fetchAddr(currentCoords[0],currentCoords[1]).then(a=>{if(a&&RT.getCase(c.id))RT.updateCase(c.id,{addr:a});});
+  b.classList.add('hidden');
+  document.getElementById('postRow').classList.remove('hidden');
+  toast('أُرسل بلاغ '+p.name+' للمسعف ✓','الاسم والسجل والموقع وصلوا للوحة الآن');
+}
+
+function resetNfc(){
+  stopTrack();
+  document.getElementById('postRow').classList.add('hidden');
+  const b=document.getElementById('sendBtn');
+  b.disabled=false;b.classList.remove('hidden');
+  b.innerHTML='<svg class="ic"><use href="#i-send"/></svg> <span id="sendBtnTxt">بلاغ عن '+TAG_PERSON.name+'</span>';
+  const nb=document.getElementById('postRow').querySelector('.btn.notify');
+  if(nb){nb.disabled=false;nb.classList.remove('sent');nb.innerHTML='<svg class="ic"><use href="#i-friends"/></svg> إرسال رسالة لأحد الأقارب';}
+  if(pinMap){pinMap.remove();pinMap=null;pinMarker=null;accCircle=null;}
+  currentCoords=null;manual=false;locked=false;gotFix=false;
+  initPinMap();
+  useLiveFix();
+}
+
+function notifyRelative(){
+  const p=TAG_PERSON;
+  const nb=document.getElementById('postRow').querySelector('.btn.notify');
+  if(nb){nb.disabled=true;nb.classList.add('sent');nb.innerHTML='<svg class="ic"><use href="#i-check-circle"/></svg> أُرسلت لأقارب '+p.name;}
+  toast('أُرسلت رسالة إلى أحد أقارب '+p.name+' ✓','محاكاة — لا تُرسل رسالة حقيقية');
+}
+
+function stepForStatus(st){
+  if(st==='تم القبول')return 1;
+  if(st==='في الطريق')return 2;
+  if(st==='وصل الموقع')return 3;
+  return 0;
+}
+function calcKm(a,b){
+  const R=6371,toR=x=>x*Math.PI/180;
+  const la=toR(b[0]-a[0]),lb=toR(b[1]-a[1]);
+  const h=Math.sin(la/2)*Math.sin(la/2)+Math.cos(toR(a[0]))*Math.cos(toR(b[0]))*Math.sin(lb/2)*Math.sin(lb/2);
+  return h<0?0:2*R*Math.asin(Math.sqrt(Math.min(h,1)));
+}
+function distToCaseKm(t,c){
+  if(!t||t.lat==null||t.lng==null||!c||!c.coords)return null;
+  try{return calcKm([t.lat,t.lng],[c.coords[0],c.coords[1]]);}catch(e){return null;}
+}
+function renderTrack(){
+  const box=document.getElementById('statusBox');
+  if(!box)return;
+  const c=lastNfcCaseId?RT.getCase(lastNfcCaseId):null;
+  if(!c){stopTrack();return;}
+  const st=c.status||'جديد',s=stepForStatus(st);
+  const tel=lastTelemetry&&lastTelemetry.id===lastNfcCaseId?lastTelemetry:null;
+  const line=document.getElementById('trackLine');
+  if(st==='وصل الموقع'){
+    line.className='track-line done';
+    line.innerHTML='<svg class="ic"><use href="#i-check-circle"/></svg> وصل المسعف الموقع — ابقَ في مكانك';
+  }else if(st==='في الطريق'){
+    line.className='track-line go';
+    line.innerHTML='<span class="dot-live"></span> المسعف في الطريق إليك';
+  }else if(st==='تم القبول'){
+    line.className='track-line ok';
+    line.innerHTML='<svg class="ic"><use href="#i-check-circle"/></svg> المسعف قبِل البلاغ — جاهز للتحرك';
+  }else{
+    line.className='track-line wait';
+    line.innerHTML='<span class="dot-live"></span> بانتظار قبول المسعف…';
+  }
+  const eta=document.getElementById('trackEta');
+  let etaHtml='';
+  if(st==='وصل الموقع'){
+    etaHtml='<div class="chip near"><svg class="ic"><use href="#i-home"/></svg> <b>وصلت الفرقة — أبقِ الباب مفتوحاً</b></div>';
+  }else if(tel&&tel.eta!=null){
+    const d=distToCaseKm(tel,c);
+    const near=d!=null&&d<0.5;
+    etaHtml=`<div class="chip"><svg class="ic"><use href="#i-target"/></svg> الوصول خلال <b>≈ ${tel.eta}</b> دقيقة</div>`;
+    if(d!=null)etaHtml+=`<div class="chip ${near?'near':''}"><svg class="ic"><use href="#i-pin"/></svg> المسافة <b>${d<1?Math.round(d*1000)+'م':d.toFixed(1)+' كم'}</b></div>`;
+    if(near)etaHtml+=`<div class="chip near"><svg class="ic"><use href="#i-home"/></svg> المسعف <b>قريب منك</b></div>`;
+  }
+  eta.innerHTML=etaHtml;
+  const steps=document.getElementById('trackSteps');
+  steps.innerHTML=['قبول البلاغ','التحرك إليك','وصول المسعف'].map((l,i)=>
+    `<div class="step ${i<s?'done':i===s?'on':''}"><span class="dot"><svg class="ic"><use href="#i-check-circle"/></svg></span><small>${l}</small></div>`+(i<2?`<div class="join ${i<s?'done':''}"></div>`:'')
+  ).join('');
+}
+function showTrack(id){
+  lastNfcCaseId=id;lastTelemetry=null;
+  const box=document.getElementById('statusBox');
+  if(box)box.classList.remove('hidden');
+  renderTrack();
+}
+function stopTrack(){
+  lastNfcCaseId=null;lastTelemetry=null;
+  const box=document.getElementById('statusBox');
+  if(box)box.classList.add('hidden');
+}
+function trackUpdated(c){if(c&&c.id===lastNfcCaseId){if(!RT.getCase(c.id)){stopTrack();return;}renderTrack();}}
+function trackTelemetry(t){if(t&&t.id===lastNfcCaseId){lastTelemetry=t;renderTrack();}}
+function trackRemoved(m){
+  if(!m||m.id!==lastNfcCaseId)return;
+  const line=document.getElementById('trackLine');
+  if(line){line.className='track-line done';line.innerHTML='<svg class="ic"><use href="#i-check-circle"/></svg> اكتمل البلاغ — شكراً لك يا بطل';}
+  const eta=document.getElementById('trackEta');
+  if(eta)eta.innerHTML='';
+  const box=document.getElementById('statusBox');
+  if(box)box.classList.remove('hidden');
+  lastTelemetry=null;lastNfcCaseId=null;
+}
+
+window.addEventListener('load',()=>{
+  RT.on('case-update',trackUpdated);
+  RT.on('amb-telemetry',trackTelemetry);
+  RT.on('case-removed',trackRemoved);
+  document.getElementById('manualBtn').onclick=toggleManual;
+  document.getElementById('undoBtn').onclick=undoManual;
+  document.getElementById('layerBtn').onclick=toggleBase;
+  renderWhom();
+  renderMed();
+  document.getElementById('sendBtn').classList.remove('hidden');
+  document.getElementById('sendBtnTxt').textContent='بلاغ عن '+TAG_PERSON.name;
+  initPinMap();
+  setTimeout(useLiveFix,500);
+});
+</script>
+</body>
+</html>
