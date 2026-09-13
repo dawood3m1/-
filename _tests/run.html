@@ -42,61 +42,50 @@
     var fUser=document.getElementById('fUser'),fPara=document.getElementById('fPara'),fNfc=document.getElementById('fNfc');
 
     try{
-    // ===== 1) الصفحة الأولى: المستخدم =====
+    // ===== 1) الصفحة الأولى: المستخدم (نسخة لينا هي الأساس) =====
     fUser.src='/index.html';
-    await sleep(3500);
+    await sleep(3200);
     var u=fUser.contentWindow,ud=fUser.contentDocument;
-    if(!u||!u.RT){rec(false,'INDEX لم يُحمَّل (RT مفقود)');}
-    else{
-      rec(vis(u,ud,'#scLogin.active'),'INDEX: شاشة الدخول نشطة');
-      var cards=ud.querySelectorAll('#loginList .login-card');
-      rec(cards.length===3,'INDEX: قائمة الدخول تحتوي 3 أشخاص فقط (الفعل: '+cards.length+')');
-      rec(!!u.SELF_DATA&&u.SELF_DATA.name==='خالد الجدعان','INDEX: بيانات SELF_DATA سليمة');
-      // متغيرات حذف nearby
-      var tbox=ud.getElementById('tapBox');
-      rec(tbox===null,'INDEX: عنصر tapBox أُزيل نهائياً');
-      rec((u.pickKind+'').indexOf('resetTap')===-1,'INDEX: لا إشارة إلى nearby/resetTap');
+    rec(!!u&&typeof u.startReport==='function','INDEX: الصفحة حُمّلت ودالة startReport موجودة');
+    rec(vis(u,ud,'#scHome')&&ud.querySelector('#scHome').classList.contains('active'),'INDEX: scHome نشطة افتراضياً');
+    rec(ud.querySelectorAll('#kindIds .id').length===2,'INDEX: خياران فقط «أنت/عائلة» و«قريب» (عد: '+ud.querySelectorAll('#kindIds .id').length+')');
+    rec(ud.getElementById('kindIds').textContent.indexOf('صديق')===-1,'INDEX: لا توجد خانة صديق في شاشة البلاغ');
+    rec(ud.querySelectorAll('#condsBox .cond').length===8,'INDEX: 8 حالات صحية مرسومة ('+ud.querySelectorAll('#condsBox .cond').length+')');
+    rec(typeof u.condTap==='function'&&typeof u.confirmNearby==='function','INDEX: دوال الحالة والتقاط بطاقة القريب موجودة');
 
-      // دخول
-      u.loginAs(0);
-      await sleep(800);
-      rec(ud.querySelector('#scHome').classList.contains('active'),'INDEX: الدخول ينقل إلى الشاشة الرئيسية');
-      rec(!!gv(u,'map'),'INDEX: خريطة Leaflet أُنشئت');
-      rec(vis(u,ud,'#scHome .layers-btn'),'INDEX: زر تبديل الطبقات (أقمار/شوارع) موجود');
+    // الذهاب إلى شاشة البلاغ
+    u.startReport();
+    await sleep(300);
+    rec(ud.querySelector('#scReport').classList.contains('active'),'INDEX: «طلب إسعاف» ينقل إلى شاشة البلاغ scReport');
 
-      // اختبار زر الطبقات
-      var before=gv(u,'baseLayer');u.toggleBase();
-      rec(gv(u,'baseLayer')!==before,'INDEX: toggleBase يبدّل الطبقة ('+before+' -> '+gv(u,'baseLayer')+')');
-      u.toggleBase();
+    // إرسال بدون اختيار شخص → تنبيه
+    u.sendReport();
+    await sleep(250);
+    rec(!ud.querySelector('#scDone').classList.contains('active')&&ud.getElementById('snack').textContent.indexOf('اختر مين')>-1,'INDEX: الإرسال دون اختيار يعرض تنبيهاً');
 
-      // إرسال بلاغ يدوي (بدون GPS في headless)
-      if(u.marker)u.marker.setLatLng([21.497,39.2444]);else u.showFix({lat:21.497,lng:39.2444,acc:6,src:'gps-fused'});
-      u.confirmManual();
-      await sleep(300);
-      u.startReport();
-      await sleep(700);
-      var cs1=u.RT.getCases();
-      rec(cs1.length>=1,'INDEX: startReport أنشأ حالة ('+cs1.length+')');
-      rec(!!gv(u,'quickCaseId'),'INDEX: quickCaseId معرّف');
-      rec(cs1[0]&&cs1[0].coords&&cs1[0].coords.length===2,'INDEX: الحالة تملك إحداثيات');
-      var firstId=cs1[0]?cs1[0].id:null;
+    // اختيار «أنت / أحد أفراد العائلة»
+    u.pickKind(ud.querySelectorAll('#kindIds .id')[0],'family');
+    await sleep(200);
+    rec(!ud.getElementById('famList').classList.contains('hidden')&&ud.querySelectorAll('#famList .id').length===4,'INDEX: قائمة العائلة تظهر (4 أشخاص)');
+    u.pickFamily(ud.querySelectorAll('#famList .id')[0],0);
+    await sleep(200);
+    rec(!ud.getElementById('profileBox').classList.contains('hidden')&&ud.getElementById('profileBox').textContent.indexOf('O+')>-1,'INDEX: البروفايل الذاتي يعرض فصيلة الدم');
 
-      // العودة + العرض التلقائي
-      u.enterHome();
-      await sleep(300);
-      u.runDemo();
-      await sleep(700);
-      rec(ud.querySelector('#scDone').classList.contains('active'),'INDEX: شاشة scDone بعد العرض التلقائي');
-      rec(!!gv(u,'liveMap'),'INDEX: خريطة التتبع الحي أُنشئت');
-      var demo=u.RT.getCases().find(function(c){return c.demo;});
-      rec(!!demo,'INDEX: حالة العرض التلقائي (demo) أُنشئت');
-      rec(vis(u,ud,'#gmapLink'),'INDEX: زر خرائط جوجل في الشاشة الرئيسية');
-      rec(u.gmapsUrl&&u.gmapsUrl(21.497,39.2444).indexOf('destination=21.497')>-1,'INDEX: رابط خرائط جوجل يحمل إحداثيات الموقع');
-      rec(!!ud.getElementById('notifyRelBtn'),'INDEX: زر «إرسال رسالة لأحد الأقارب» موجود في شاشة النتيجة');
-      u.notifyRelative();
-      await sleep(200);
-      rec(ud.getElementById('notifyRelBtn').className.indexOf('sent')>-1,'INDEX: اختصار إرسال رسالة الأقارب يعمل (محاكاة)');
-    }
+    // إرسال البلاغ النهائي
+    u.sendReport();
+    await sleep(300);
+    rec(ud.querySelector('#scDone').classList.contains('active'),'INDEX: الإرسال يفتح شاشة النتيجة scDone');
+    rec(ud.getElementById('liveStatusLine').textContent.indexOf('المسعف قادم')>-1,'INDEX: رسالة «المسعف قادم» تظهر للمبلّغ');
+    rec(ud.querySelectorAll('#timeline .tl-item').length>=1,'INDEX: سجل الإرسال الفوري يضيف إدخالاً');
+
+    // البطاقة الإسعافية
+    u.openCard();
+    await sleep(200);
+    rec(ud.getElementById('cardModal')&&ud.getElementById('cardModal').textContent.indexOf('O+')>-1,'INDEX: البطاقة الإسعافية تعرض فصيلة الدم');
+    u.closeModal('cardModal');
+
+    // الأماكن المحفوظة
+    rec(typeof u.openSavePlace==='function'&&typeof u.getPlaces==='function','INDEX: واجهة الأماكن المحفوظة موجودة');
 
     // ===== 2) الصفحة الثانية: لوحة المسعف =====
     fPara.src='/paramedic.html';

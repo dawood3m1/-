@@ -86,11 +86,10 @@
     box-shadow:var(--glow),inset 0 2px 0 rgba(255,255,255,.28);
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
   }
-  .emergency .ring{position:absolute;inset:0;width:130px;height:130px;margin:auto;border-radius:50%;border:3px solid rgba(255,255,255,.3);animation:pulse 1.8s infinite;z-index:0;pointer-events:none;}
+  .emergency .ring{position:absolute;width:130px;height:130px;border-radius:50%;border:3px solid rgba(255,255,255,.3);animation:pulse 1.8s infinite;}
   .emergency .ring.r2{animation-delay:.6s;}
   .emergency .ring.r3{animation-delay:1.2s;}
   @keyframes pulse{0%{transform:scale(.55);opacity:1}100%{transform:scale(2.15);opacity:0}}
-  .emergency small,.emergency strong{position:relative;z-index:1;}
   .emergency small{font-size:11.5px;letter-spacing:2px;color:rgba(255,255,255,.9);font-weight:700;}
   .emergency strong{font-size:32px;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,.2);}
 
@@ -101,7 +100,6 @@
   #miniMap{width:100%;height:280px;}
   .map-status{
     position:absolute;top:10px;right:10px;z-index:1000;
-    max-width:calc(100% - 140px);white-space:normal;line-height:1.5;
     display:flex;align-items:center;gap:5px;
     font-size:11px;font-weight:800;padding:6px 12px;border-radius:999px;
     background:var(--chip);border:1px solid var(--line);color:var(--text);backdrop-filter:blur(6px);
@@ -109,7 +107,6 @@
   .map-status.ready{color:var(--ok);background:var(--okbg);border-color:transparent;}
   .map-hint{
     position:absolute;bottom:10px;right:10px;z-index:1000;
-    max-width:calc(100% - 140px);
     font-size:9.5px;font-weight:700;color:var(--muted);padding:4px 10px;border-radius:999px;
     background:var(--chip);border:1px solid var(--line);
   }
@@ -120,24 +117,6 @@
     backdrop-filter:blur(6px);font-family:inherit;cursor:pointer;transition:.12s;
   }
   .map-fix.on{background:var(--accent);border-color:var(--accent);color:#fff;}
-  .map-fix.alt{top:92px;background:rgba(62,142,247,.16);border-color:var(--accent);color:var(--accent2);}
-  .layers-btn{
-    position:absolute;left:10px;top:84px;z-index:1000;
-    display:flex;align-items:center;gap:6px;
-    padding:6px 11px;border-radius:999px;font-size:11px;font-weight:800;
-    background:var(--chip);border:1px solid var(--line);color:var(--text);
-    backdrop-filter:blur(6px);font-family:inherit;cursor:pointer;transition:.12s;
-  }
-  .layers-btn .ic{width:12px;height:12px;}
-  #layerBtnLive{top:10px;}
-  .map-status.warn{color:#FFB547;background:rgba(240,166,62,.14);border-color:rgba(240,166,62,.4);}
-  .demo-btn{align-self:center;display:flex;align-items:center;gap:7px;padding:11px 20px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--text);font-family:inherit;font-size:12.5px;font-weight:800;cursor:pointer;transition:.12s;}
-  .demo-btn:active{transform:scale(.96);}
-  .demo-btn .ic{width:14px;height:14px;color:var(--red2);}
-  .prec-line{display:none;align-items:center;gap:6px;font-size:10.5px;font-weight:700;color:var(--muted);margin-top:8px;}
-  .prec-line .ic{width:11px;height:11px;color:var(--ok);flex:none;}
-  .prec-line b{color:var(--accent2);}
-  #liveMap{width:100%;height:215px;}
   .manual-panel{
     display:none;position:absolute;left:10px;right:10px;bottom:10px;z-index:1000;
     background:var(--chip);border:1px solid var(--accent);border-radius:14px;padding:11px;backdrop-filter:blur(8px);
@@ -202,11 +181,24 @@
   .id.sel{background:rgba(62,142,247,.16);border-color:var(--accent);}
 
   .fam-ids{margin-top:10px;grid-template-columns:1fr 1fr;}
-  .fam-ids .id{padding:11px 8px;position:relative;}
+  .fam-ids .id{padding:11px 8px;}
   .fam-ids .id .ico{font-size:18px;margin-bottom:4px;}
-  .friend-del{position:absolute;top:4px;left:8px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;font-size:10px;line-height:18px;text-align:center;cursor:pointer;opacity:.85;border:none;}
   .id-age{display:block;font-size:10px;font-weight:700;color:var(--muted);margin-top:2px;}
   .id.sel .id-age{color:var(--accent2);}
+
+  .tap-box{text-align:center;padding:14px 0 2px;margin-top:4px;}
+  .tap-anim{position:relative;width:90px;height:90px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;}
+  .tap-ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--red);opacity:0;animation:tapring 2s ease-out infinite;}
+  .tap-ring.r2{animation-delay:.5s;}
+  .tap-ring.r3{animation-delay:1s;}
+  @keyframes tapring{0%{transform:scale(.5);opacity:.7}100%{transform:scale(1.15);opacity:0}}
+  .tap-ico{font-size:32px;z-index:1;}
+  .tap-txt{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.7;min-height:2.4em;}
+  .tap-btn{width:100%;padding:13px;font-size:14px;font-weight:800;background:linear-gradient(160deg,var(--accent2),var(--accent));border-radius:14px;box-shadow:var(--glow2);}
+  .blood-reveal{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:12px;}
+  .blood-badge{width:62px;height:62px;border-radius:50%;background:rgba(62,142,247,.14);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;font-family:var(--font-mono);color:var(--accent2);}
+  :root[data-theme="dark"] .blood-badge{color:#9CC4FF;}
+  .tap-note{font-size:11px;color:var(--muted);text-align:center;line-height:1.75;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px dashed var(--accent);margin-bottom:12px;}
 
   .ecard{border-radius:18px;padding:16px;margin:6px 0 4px;background:linear-gradient(160deg,var(--b1),var(--b3));border:1px solid var(--line);color:#fff;position:relative;overflow:hidden;}
   .ecard::after{content:'';position:absolute;inset:-40% -10% auto auto;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,var(--red),transparent 70%);opacity:.35;}
@@ -254,22 +246,7 @@
   .tl-item{display:flex;gap:10px;align-items:flex-start;font-size:12px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:13px;padding:10px 12px;}
   .tl-item .t{color:var(--muted);font-size:10px;white-space:nowrap;font-weight:700;}
   .call{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:15px;font-size:15px;font-weight:700;background:var(--card);border:1px solid var(--line);border-radius:16px;}
-  .btn.notify{width:100%;padding:15px;font-size:14px;font-weight:700;border-radius:16px;background:rgba(62,142,247,.12);border:1px solid var(--accent);color:var(--accent2);box-shadow:none;display:flex;align-items:center;justify-content:center;gap:9px;}
-  .btn.notify.sent{background:var(--okbg);color:var(--ok);border-color:rgba(61,220,132,.35);}
-  .btn:disabled{opacity:.65;pointer-events:none;}
   .back{align-self:flex-start;padding:9px 16px;border-radius:999px;font-size:12px;font-weight:800;background:var(--card);border:1px solid var(--line);font-family:inherit;cursor:pointer;}
-
-  .gmap-link{
-    display:flex;align-items:center;justify-content:center;gap:8px;
-    width:100%;padding:13px 16px;border-radius:14px;
-    font-size:13px;font-weight:900;font-family:inherit;color:#fff;
-    background:linear-gradient(160deg,#4FAA5A,#34A853);
-    box-shadow:0 12px 26px rgba(52,168,83,.25);
-    text-decoration:none;transition:.12s;cursor:pointer;
-  }
-  .gmap-link:active{transform:scale(.97);}
-  .gmap-link .ic{width:17px;height:17px;}
-  .gmap-link.report{margin-top:8px;}
 
   .pin{filter:drop-shadow(0 4px 6px rgba(0,0,0,.45));}
   .pin-ico{width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:linear-gradient(160deg,var(--accent2),var(--accent));border:3px solid #fff;display:flex;align-items:center;justify-content:center;}
@@ -318,16 +295,6 @@
   .place-card .acts button{border:none;cursor:pointer;border-radius:10px;padding:7px 12px;font-size:11px;font-weight:900;color:#fff;font-family:inherit;}
   .place-card .use{background:linear-gradient(160deg,var(--accent2),var(--accent));}
   .place-card .del{background:transparent;border:1px solid var(--line);color:var(--muted);}
-
-  .login-list{display:flex;flex-direction:column;gap:9px;}
-  .login-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:15px;background:rgba(255,255,255,.05);border:1px solid var(--line);cursor:pointer;transition:.12s;text-align:right;font-family:inherit;width:100%;}
-  .login-card:active{transform:scale(.98);}
-  .login-card .i{width:40px;height:40px;border-radius:12px;background:rgba(62,142,247,.14);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none;}
-  .login-card .i .ic{width:20px;height:20px;}
-  .login-card .n{flex:1;min-width:0;}
-  .login-card .n b{display:block;font-size:14px;font-weight:800;}
-  .login-card .n small{color:var(--muted);font-size:11px;}
-  .login-card .tag{font-size:10.5px;font-weight:900;color:var(--accent2);background:rgba(62,142,247,.14);border:1px solid var(--accent);border-radius:999px;padding:4px 9px;flex:none;}
   .empty{text-align:center;color:var(--muted);font-size:13px;padding:18px 0;line-height:1.8;font-weight:600;}
 
   .ic{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
@@ -342,11 +309,10 @@
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21.5S5 15 5 9.8a7 7 0 1 1 14 0c0 5.2-7 11.7-7 11.7z"/><circle cx="12" cy="9.6" r="2.4"/></symbol>
   <symbol id="i-pin-edit" viewBox="0 0 24 24"><path d="M12 21.5S5 15 5 9.8a7 7 0 1 1 14 0c0 5.2-7 11.7-7 11.7z"/><path d="M9.6 10.2l1.6 1.6 3-3"/></symbol>
-  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9.5 5.5 4.5 10l5 4.5"/><path d="M4.5 10h9.8a5.2 5.2 0 0 1 0 10.4H8.5"/></symbol>
-  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7.5 5 18 12l-10.5 7z"/></symbol>
   <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9.5h12V10"/><path d="M10 19.5v-5h4v5"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M2.6 20c1.1-3.6 3.6-5.4 6.4-5.4s5.3 1.8 6.4 5.4"/><circle cx="17.3" cy="8.6" r="2.6"/><path d="M15.4 14.3c2.1.1 4 1.7 4.9 4.3"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.2 20c1.5-4 5-6 7.8-6s6.3 2 7.8 6"/></symbol>
+  <symbol id="i-tap" viewBox="0 0 24 24"><rect x="8.5" y="2.5" width="9" height="16" rx="2"/><path d="M11 15.5h3"/><path d="M20 6.5a6 6 0 0 1 0 8"/><path d="M4 6.5a6 6 0 0 0 0 8"/></symbol>
   <symbol id="i-nfc" viewBox="0 0 24 24"><path d="M5 8a8 8 0 0 1 0 8"/><path d="M9 5.5a11.6 11.6 0 0 1 0 13"/><circle cx="16.5" cy="12" r="2.2"/></symbol>
   <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.3"/><path d="M8 12.3l2.7 2.7 5.3-5.6"/></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4.3c.4-.9 1.3-1.5 2.3-1.3l2.4.4c.8.1 1.4.7 1.6 1.4l.7 2.6c.2.7 0 1.5-.6 2l-1.6 1.4c1 2.5 3 4.6 5.6 5.6l1.4-1.6c.5-.6 1.3-.8 2-.6l2.6.7c.8.2 1.3.9 1.4 1.6l.4 2.4c.2 1-.4 1.9-1.3 2.3-1 .4-2 .6-3 .5-8-.7-14.4-7-15.1-15-.1-1 .1-2.1.5-3z"/></symbol>
@@ -371,8 +337,6 @@
   <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.2s-7.6-4.6-9.7-9.4C.6 6.8 3 3.6 6.4 3.6c2 0 3.6 1.2 5.6 3.6 2-2.4 3.6-3.6 5.6-3.6 3.4 0 5.8 3.2 4.1 7.2C19.6 15.6 12 20.2 12 20.2z"/></symbol>
   <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8.5h11a2.8 2.8 0 1 0-2.8-2.8"/><path d="M3 15.5h14.5a2.8 2.8 0 1 1-2.8 2.8"/><path d="M3 12h8"/></symbol>
   <symbol id="i-head" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.3"/><path d="M9 9l2.2 3-2.2 3M15 9l-2.2 3 2.2 3" opacity=".7"/></symbol>
-  <symbol id="i-friends" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M3 20c1.2-3.7 3.5-5.5 6-5.5s4.8 1.8 6 5.5"/><path d="M17.9 7.2h-2.3"/><path d="M16.7 6v2.4"/><path d="M18.6 12.6c.9-.8 2.1.1 2.1 1.2 0 1.3-2.1 3-2.1 3s-2.1-1.7-2.1-3c0-1.1 1.2-2 2.1-1.2z" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3 2.5 8 12 13l9.5-5z"/><path d="M2.5 12 12 17l9.5-5"/><path d="M2.5 16.2 12 21.2l9.5-5.3" opacity=".45"/></symbol>
 </svg>
 
 <div class="app">
@@ -388,16 +352,7 @@
     <button class="hdr-btn" onclick="openMenu()" aria-label="القائمة"><svg class="ic"><use href="#i-menu"/></svg></button>
   </header>
 
-  <section id="scLogin" class="screen active">
-    <div class="hero">
-      <h2>من أنت؟</h2>
-      <p>اختر شخصاً للدخول — لا كلمة مرور، مجرد تحديد السيناريو الذي ستعمل به</p>
-    </div>
-    <div class="login-list" id="loginList"></div>
-    <div class="ready-note" style="justify-content:center"><svg class="ic"><use href="#i-check-circle"/></svg> سجلّك الطبي وبطاقتك الإسعافية يتبعان الشخص الذي اخترته</div>
-  </section>
-
-  <section id="scHome" class="screen">
+  <section id="scHome" class="screen active">
     <div class="hero">
       <h2>موقعك جاهز للإرسال</h2>
       <p>اضغط الزر الأحمر، ويغادر المسعف فوراً إليك</p>
@@ -414,8 +369,6 @@
       <div class="map-status wait" id="mapStatus"><span class="dot-live"></span> بانتظار إذن الموقع…</div>
       <div class="map-hint" id="mapHint">جارٍ التحديد عالي الدقة</div>
       <button class="map-fix" id="manualBtn" onclick="toggleManual()"><svg class="ic"><use href="#i-pin-edit"/></svg> تعديل الموقع</button>
-      <button class="map-fix alt" id="undoBtn" onclick="undoManual()" style="display:none"><svg class="ic"><use href="#i-undo"/></svg> الرجوع لموقعي</button>
-      <button class="layers-btn" id="layerBtn" onclick="toggleBase()"><svg class="ic"><use href="#i-layers"/></svg> أقمار صناعية</button>
       <div class="manual-panel" id="manualPanel">
         <p>اسحب الدبوس إلى مدخل موقع الحالة ثم أكّد</p>
         <div class="row">
@@ -431,12 +384,6 @@
     </div>
 
     <div class="ready-note" id="readyNote"><svg class="ic"><use href="#i-target"/></svg> الموقع <b id="readyText">بانتظار الإذن…</b></div>
-
-    <a class="gmap-link" id="gmapLink" target="_blank" rel="noopener" onclick="openGmaps()"><svg class="ic"><use href="#i-target"/></svg> فتح موقعي في خرائط جوجل</a>
-
-    <div class="prec-line" id="precLine"></div>
-
-    <button class="demo-btn" onclick="runDemo()"><svg class="ic"><use href="#i-play"/></svg> عرض تلقائي كامل أمام اللجنة</button>
 
     <div class="quick-row">
       <button class="quick-tile" onclick="openRecord()">
@@ -458,18 +405,18 @@
       <div class="loc" id="locBox">
         <div class="lbl"><svg class="ic"><use href="#i-home"/></svg> الموقع الرئيسي</div>
         <div id="locText">جارٍ التحديث…</div>
-        <div class="lbl" id="locAddr" style="margin-top:5px"></div>
-        <a class="gmap-link report" id="gmapLinkReport" target="_blank" rel="noopener" onclick="openGmaps()"><svg class="ic"><use href="#i-target"/></svg> فتح الموقع في خرائط جوجل</a>
       </div>
     </div>
     <div class="sheet">
-      <h3><span class="bar"></span> عن مَن البلاغ؟ — حدّد البروفايل</h3>
+      <h3><span class="bar"></span> مين الشخص المبلّغ عنه؟</h3>
       <div class="ids" id="kindIds">
-        <button class="id" onclick="pickKind(this,'self')"><span class="ico"><svg class="ic"><use href="#i-user"/></svg></span> أنا — نفسي</button>
-        <button class="id" onclick="pickKind(this,'family')"><span class="ico"><svg class="ic"><use href="#i-users"/></svg></span> أحد أفراد عائلتي</button>
-        </div>
+        <button class="id" onclick="pickKind(this,'family')"><span class="ico"><svg class="ic"><use href="#i-users"/></svg></span> أنت أو أحد أفراد عائلتك</button>
+        <button class="id" onclick="pickKind(this,'nearby')"><span class="ico"><svg class="ic"><use href="#i-tap"/></svg></span> شخص بالقرب منك</button>
+      </div>
 
       <div class="ids fam-ids hidden" id="famList"></div>
+
+      <div class="tap-box hidden" id="tapBox"></div>
 
       <div class="profile hidden" id="profileBox"></div>
     </div>
@@ -478,7 +425,7 @@
       <div class="conds" id="condsBox"></div>
       <textarea id="desc" placeholder="أضف وصفاً إضافياً (اختياري)…"></textarea>
     </div>
-    <button class="btn send" onclick="sendReport()">إنهاء البلاغ — عرض الحالة</button>
+    <button class="btn send" onclick="sendReport()">إرسال البلاغ النهائي</button>
   </section>
 
   <section id="scDone" class="screen">
@@ -491,18 +438,11 @@
       </div>
       <div class="live" style="display:flex;justify-content:center;margin-top:12px"><span class="dot-live"></span> <span id="liveStatusLine">المسعف قادم</span></div>
     </div>
-    <div class="map-card" id="liveCard" style="display:none">
-      <div id="liveMap"></div>
-      <div class="map-status wait" id="liveStatus"><span class="dot-live"></span> المسعف قادم</div>
-      <div class="map-hint" id="liveHint">مراقبة موقع المسعف لحظياً</div>
-      <button class="layers-btn" id="layerBtnLive" onclick="toggleBase()"><svg class="ic"><use href="#i-layers"/></svg> أقمار صناعية</button>
-    </div>
     <div class="sheet">
       <h3><span class="bar"></span> سجل الإرسال الفوري</h3>
       <div class="timeline" id="timeline"></div>
     </div>
     <button class="btn call" onclick="fakeCall()"><svg class="ic"><use href="#i-phone"/></svg> الاتصال بالمسعف</button>
-    <button class="btn notify" id="notifyRelBtn" onclick="notifyRelative()"><svg class="ic"><use href="#i-friends"/></svg> إرسال رسالة لأحد أقارب هذا الشخص</button>
   </section>
 </div>
 
@@ -514,7 +454,6 @@
     <div class="menu-items">
       <button onclick="closeModal('menuModal');openRecord()"><span class="mi"><svg class="ic"><use href="#i-stethoscope"/></svg></span> سجلي الطبي</button>
       <button onclick="closeModal('menuModal');openCard()"><span class="mi"><svg class="ic"><use href="#i-card"/></svg></span> بطاقتي الإسعافية</button>
-      <button onclick="closeModal('menuModal');gotoLogin()"><span class="mi"><svg class="ic"><use href="#i-users"/></svg></span> تغيير الشخص / السيناريو</button>
       <button onclick="closeModal('menuModal');openSavePlace()"><span class="mi"><svg class="ic"><use href="#i-pin"/></svg></span> إضافة مكان جديد</button>
       <button onclick="closeModal('menuModal');openPlaces()"><span class="mi"><svg class="ic"><use href="#i-folder"/></svg></span> أماكن محفوظة</button>
     </div>
@@ -526,7 +465,12 @@
   <div class="box">
     <div class="title"><svg class="ic"><use href="#i-stethoscope"/></svg> سجلي الطبي</div>
     <div class="sub">هذا ما يصل المسعف تلقائيًا عند أي بلاغ باسمك</div>
-    <div id="recordFields"></div>
+    <div class="field"><span>العمر</span><b class="blood-mono">26 سنة</b></div>
+    <div class="field"><span>فصيلة الدم</span><b class="blood-mono">O+</b></div>
+    <div class="field"><span>الحساسية</span><b>بنسلين</b></div>
+    <div class="field"><span>الأمراض المزمنة</span><b>ربو خفيف</b></div>
+    <div class="field"><span>الأدوية الحالية</span><b>أسبرين 81مغ</b></div>
+    <div class="field"><span>آخر عملية</span><b>استئصال الزائدة (2021)</b></div>
     <div class="row"><button class="btn-ghost" onclick="closeModal('recordModal')" style="flex:1">إغلاق</button></div>
   </div>
 </div>
@@ -540,12 +484,12 @@
         <div class="ecard-chip"></div>
         <div class="ecard-brand"><span>اسعفني</span><svg class="ic ecard-waves"><use href="#i-nfc"/></svg></div>
       </div>
-      <div class="ecard-name" id="cardNameSlot">…</div>
+      <div class="ecard-name">داود العتيبي</div>
       <div class="ecard-bottom">
         <div class="ecard-fields">
-          <div><small>العمر</small><b class="blood-mono" id="cardAgeSlot">…</b></div>
-          <div><small>فصيلة الدم</small><b class="blood-mono" id="cardBloodSlot">…</b></div>
-          <div><small>حساسية</small><b id="cardAllergySlot">…</b></div>
+          <div><small>العمر</small><b class="blood-mono">26</b></div>
+          <div><small>فصيلة الدم</small><b class="blood-mono">O+</b></div>
+          <div><small>حساسية</small><b>نعم</b></div>
         </div>
         <div class="ecard-qr"><svg viewBox="0 0 10 10"><rect width="10" height="10" fill="#fff"/><rect x="1" y="1" width="1" height="1" fill="#101820"/><rect x="3" y="1" width="1" height="1" fill="#101820"/><rect x="4" y="1" width="1" height="1" fill="#101820"/><rect x="6" y="1" width="1" height="1" fill="#101820"/><rect x="8" y="1" width="1" height="1" fill="#101820"/><rect x="1" y="2" width="1" height="1" fill="#101820"/><rect x="2" y="2" width="1" height="1" fill="#101820"/><rect x="5" y="2" width="1" height="1" fill="#101820"/><rect x="7" y="2" width="1" height="1" fill="#101820"/><rect x="8" y="2" width="1" height="1" fill="#101820"/><rect x="1" y="3" width="1" height="1" fill="#101820"/><rect x="4" y="3" width="1" height="1" fill="#101820"/><rect x="5" y="3" width="1" height="1" fill="#101820"/><rect x="7" y="3" width="1" height="1" fill="#101820"/><rect x="1" y="4" width="1" height="1" fill="#101820"/><rect x="4" y="4" width="1" height="1" fill="#101820"/><rect x="5" y="4" width="1" height="1" fill="#101820"/><rect x="7" y="4" width="1" height="1" fill="#101820"/><rect x="8" y="4" width="1" height="1" fill="#101820"/><rect x="2" y="5" width="1" height="1" fill="#101820"/><rect x="3" y="5" width="1" height="1" fill="#101820"/><rect x="6" y="5" width="1" height="1" fill="#101820"/><rect x="8" y="5" width="1" height="1" fill="#101820"/><rect x="1" y="6" width="1" height="1" fill="#101820"/><rect x="3" y="6" width="1" height="1" fill="#101820"/><rect x="4" y="6" width="1" height="1" fill="#101820"/><rect x="6" y="6" width="1" height="1" fill="#101820"/><rect x="8" y="6" width="1" height="1" fill="#101820"/><rect x="1" y="7" width="1" height="1" fill="#101820"/><rect x="2" y="7" width="1" height="1" fill="#101820"/><rect x="5" y="7" width="1" height="1" fill="#101820"/><rect x="7" y="7" width="1" height="1" fill="#101820"/><rect x="8" y="7" width="1" height="1" fill="#101820"/><rect x="1" y="8" width="1" height="1" fill="#101820"/><rect x="4" y="8" width="1" height="1" fill="#101820"/><rect x="5" y="8" width="1" height="1" fill="#101820"/><rect x="7" y="8" width="1" height="1" fill="#101820"/></svg></div>
       </div>
@@ -590,569 +534,166 @@
   </div>
 </div>
 
-<div class="modal" id="addFriendModal">
-  <div class="box">
-    <div class="title"><svg class="ic"><use href="#i-friends"/></svg> إضافة صديق</div>
-    <div class="sub">ملف صحي كامل يصل المسعف عند البلاغ عنه</div>
-    <input class="minput" id="frName" placeholder="الاسم">
-    <input class="minput" id="frAge" placeholder="العمر">
-    <input class="minput" id="frBlood" placeholder="فصيلة الدم (مثال: O+)">
-    <input class="minput" id="frAllergy" placeholder="الحساسية — أو «لا يوجد»">
-    <input class="minput" id="frDrugs" placeholder="الأدوية الحالية">
-    <input class="minput" id="frChronic" placeholder="الأمراض المزمنة">
-    <input class="minput" id="frOps" placeholder="آخر عملية">
-    <div class="row">
-      <button class="btn-ghost" onclick="closeModal('addFriendModal')">إلغاء</button>
-      <button class="btn-primary" onclick="saveFriend()"><svg class="ic"><use href="#i-save"/></svg> حفظ الصديق</button>
-    </div>
-  </div>
-</div>
-
-<script src="scenarios.js"></script>
-<script src="firebase-config.js"></script>
-<script src="realtime.js"></script>
 <script>
 const CONDITIONS=[{icon:"i-zzz",t:"مغمى عليه"},{icon:"i-target",t:"دوخة / دوار"},{icon:"i-drop",t:"نزيف"},{icon:"i-heart",t:"ألم في الصدر"},{icon:"i-wind",t:"صعوبة تنفس"},{icon:"i-bolt",t:"نوبة تشنجية"},{icon:"i-head",t:"إصابة رأس"},{icon:"i-alert",t:"حالة أخرى"}];
 
-let pickedKind=null,selectedPerson=null,lastCaseId=null,quickCaseId=null,PERSON_LIST=[],selectedId=0,map=null,marker=null,accCircle=null,watchId=null,gotFix=false;
-let manual=false,locked=false,dispatchPos=null,lastAcc=Infinity,bestFix=null,refineTimer=null;
-let samples=[],ipFallbackUsed=false;
-let stats={start:Date.now(),fixCount:0,best:Infinity,lockMs:null,lockedAcc:0};
-let liveMap=null,liveAmbMarker=null,liveCaseMarker=null,liveFit=false;
-let lastKnown=null;try{lastKnown=JSON.parse(localStorage.getItem('asafni_lastloc')||'null');}catch(e){lastKnown=null;}
+const FAMILY=[
+  {name:"أنت — داود العتيبي",relation:"أنت",age:26,ico:"i-user",blood:"O+",drugs:"أسبرين 81مغ",allergy:"بنسلين",ops:"استئصال الزائدة (2021)",chronic:"ربو خفيف"},
+  {name:"الأم — منيرة العتيبي",relation:"الأم",age:54,ico:"i-users",blood:"A-",drugs:"ميتفورمين، لوسارتان",allergy:"لا يوجد",ops:"لا يوجد",chronic:"سكري نوع 2، ضغط"},
+  {name:"الأب — سالم العتيبي",relation:"الأب",age:58,ico:"i-users",blood:"B+",drugs:"مميّع دم، مدرّ للبول",allergy:"لا يوجد",ops:"قسطرة قلبية (2023)",chronic:"قصور بعضلة القلب"},
+  {name:"الأخت — سارة العتيبي",relation:"الأخت",age:19,ico:"i-users",blood:"AB+",drugs:"بخاخ سالبوتامول عند الحاجة",allergy:"مكسرات",ops:"لا يوجد",chronic:"ربو"}
+];
+const NEARBY_STRANGER={name:"خالد إبراهيم العتيبي",age:41,blood:"A-"};
+
+let pickedKind=null,selectedId=0,map=null,marker=null,accCircle=null,watchId=null,gotFix=false;
+let manual=false,dispatchPos=null,lastAcc=Infinity;
 let saveMap=null,saveMarker=null,placeType='منزل',placePhoto=null;
 let theme=localStorage.getItem('asafni_theme')||'dark';
-let LOGIN_PEOPLE=[],CURRENT_IDENTITY=null;
-
-function buildLoginList(){
-  const self=window.SELF_DATA||{};
-  const fam=(window.SCENARIO_FAMILY||[]).map(p=>({name:p.name,age:p.age,blood:p.blood,tag:'عائلة',ico:'i-users',allergy:p.allergy||'لا يوجد',drugs:p.drugs||'لا يوجد',ops:p.ops||'لا يوجد',chronic:p.chronic||'لا يوجد'}));
-  const fr=getFriends().map(p=>({name:p.name,age:p.age,blood:p.blood,tag:'صديق',ico:'i-friends',allergy:p.allergy||'لا يوجد',drugs:p.drugs||'لا يوجد',ops:p.ops||'لا يوجد',chronic:p.chronic||'لا يوجد'}));
-  LOGIN_PEOPLE=[{name:self.name||'أنت',age:self.age,blood:self.blood,tag:'أنت',ico:'i-user',allergy:self.allergy||'لا يوجد',drugs:self.drugs||'لا يوجد',ops:self.ops||'لا يوجد',chronic:self.chronic||'لا يوجد'}].concat(fam,fr);
-  document.getElementById('loginList').innerHTML=LOGIN_PEOPLE.map((p,i)=>`
-    <button class="login-card" onclick="loginAs(${i})">
-      <span class="i"><svg class="ic"><use href="#${p.ico}"/></svg></span>
-      <span class="n"><b>${p.name}</b><small>${p.age?p.age+' سنة':'العمر غير محدد'} · فصيلة ${p.blood||'—'}</small></span>
-      <span class="tag">${p.tag}</span>
-    </button>`).join('');
-}
-
-function loginAs(i){
-  const p=LOGIN_PEOPLE[i];if(!p)return;
-  window.SELF_DATA={name:p.name,age:p.age,blood:p.blood,allergy:p.allergy,drugs:p.drugs,ops:p.ops,chronic:p.chronic};
-  CURRENT_IDENTITY=p.name;
-  toast('أهلاً '+p.name+' — دخلت بسيناريو «'+p.tag+'»');
-  enterHome();
-}
-
-function enterHome(){
-  show('scHome');
-  if(map)setTimeout(()=>map.invalidateSize(),80);
-  else {initMap();requestLocation();}
-}
-
-function gotoLogin(){
-  show('scLogin');
-  buildLoginList();
-}
 
 const pinIcon=L.divIcon({className:'pin',html:'<div class="pin-ico"></div>',iconSize:[30,30],iconAnchor:[15,28],popupAnchor:[0,-30]});
 
-let baseLayer='street';
-const TILE_LAYERS={
-  street:()=>'https://{s}.basemaps.cartocdn.com/'+(theme==='light'?'light_all':'dark_all')+'/{z}/{x}/{y}{r}.png',
-  satellite:()=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-};
-function tileUrl(){return TILE_LAYERS[baseLayer]();}
-function toggleBase(){
-  baseLayer=baseLayer==='street'?'satellite':'street';
-  swapTiles();
-  const lbl=baseLayer==='street'?'أقمار صناعية':'شوارع';
-  document.querySelectorAll('.layers-btn').forEach(b=>{b.innerHTML='<svg class="ic"><use href="#i-layers"/></svg> '+lbl;});
-}
+function tileUrl(){return theme==='light'?'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png':'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';}
 
 window.addEventListener('load',()=>{
   document.getElementById('condsBox').innerHTML=CONDITIONS.map((c,i)=>`<button class="cond" onclick="condTap(this,${i})"><svg class="ic"><use href="#${c.icon}"/></svg> ${c.t}</button>`).join('');
-  applyTheme();buildLoginList();renderShortcuts();
+  applyTheme();initMap();requestLocation();renderShortcuts();
 });
 
 function applyTheme(){document.documentElement.setAttribute('data-theme',theme);document.getElementById('themeToggle').innerHTML='<svg class="ic"><use href="#'+(theme==='dark'?'i-sun':'i-moon')+'"/></svg>';swapTiles();}
 function toggleTheme(){theme=theme==='dark'?'light':'dark';localStorage.setItem('asafni_theme',theme);applyTheme();}
-function swapTiles(){const u=tileUrl();[map,saveMap,liveMap].forEach(m=>{if(!m)return;m.eachLayer(l=>{if(l instanceof L.TileLayer)m.removeLayer(l);});L.tileLayer(u,{attribution:'© OSM · Esri · CARTO'}).addTo(m);});}
+function swapTiles(){const u=tileUrl();[map,saveMap].forEach(m=>{if(!m)return;m.eachLayer(l=>{if(l instanceof L.TileLayer)m.removeLayer(l);});L.tileLayer(u,{attribution:'© OSM © CARTO'}).addTo(m);});}
 
 function initMap(){map=L.map('miniMap',{zoomControl:true,attributionControl:false}).setView([21.496964,39.244428],11);L.tileLayer(tileUrl(),{attribution:'© OSM © CARTO'}).addTo(map);}
 
 function requestLocation(){
   if(!navigator.geolocation){setMapStatus(false,'الموقع غير مدعوم');document.getElementById('readyText').textContent='غير مدعوم';return;}
   setMapStatus(false,'بانتظار إذن الموقع…');
-  startWatch();
-  setTimeout(()=>{if(!gotFix&&!manual&&!locked)useLastKnown();},3500);
-  setTimeout(()=>{if(!gotFix&&!manual&&!locked)ipFallback();},6500);
-}
-function startWatch(){
-  if(watchId!=null)return;
   watchId=navigator.geolocation.watchPosition(onFix,err=>{
-    if(err.code===1)document.getElementById('mapHint').textContent='اسمح بالوصول للموقع حتى نرسل البلاغ بدقة';
-    setMapStatus(false,'تعذّر الموقع — سنستخدم حساب الشبكة');document.getElementById('readyText').textContent='تعذّر GPS';
-  },{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+    if(err.code===1)document.getElementById('mapHint').textContent='اسمح بالوصول للموقع حتى نرسلها';
+    setMapStatus(false,'تعذّر الموقع');document.getElementById('readyText').textContent='تعذّر التحديد';
+  },{enableHighAccuracy:true,timeout:10000,maximumAge:0});
 }
 
-function onFix(pos){ingestFix(pos,'gps-live');}
+function onFix(pos){applyFix(pos,true);}
 
-function distM(a,b){const R=6371000,t=p=>p*Math.PI/180,dlat=t(b[0]-a[0]),dlng=t(b[1]-a[1]);const h=Math.sin(dlat/2)**2+Math.cos(t(a[0]))*Math.cos(t(b[0]))*Math.sin(dlng/2)**2;return R*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));}
-function accColor(acc){return acc<=15?'#3DDC84':acc<=35?'#3E8EF7':acc<=100?'#FFB547':'#FF6B76';}
-function srcLabel(src){if(!src)return'يدوي';if(src==='ip')return'شبكة / IP';if(src==='last')return'آخر موقع معروف';if(src==='gps-fused')return'GPS مدمج؛ متوسط عينات متعددة';return'GPS حي';}
-
-function saveLastKnown(fix){if(fix.acc<=200){localStorage.setItem('asafni_lastloc',JSON.stringify({lat:fix.lat,lng:fix.lng,acc:fix.acc,ts:Date.now()}));}}
-
-function showFix(target,chipTxt){
-  if(!map)return;
-  if(!marker){
-    marker=L.marker([target.lat,target.lng],{icon:pinIcon}).addTo(map);
-    accCircle=L.circle([target.lat,target.lng],{radius:Math.max(target.acc,6),color:accColor(target.acc),weight:1.5,fillColor:accColor(target.acc),fillOpacity:.12}).addTo(map);
-    map.setView([target.lat,target.lng],17);
-  }else{
-    marker.setLatLng([target.lat,target.lng]);
-    accCircle.setLatLng([target.lat,target.lng]).setRadius(Math.max(target.acc,6));
-    accCircle.setStyle({color:accColor(target.acc),fillColor:accColor(target.acc)});
-  }
-  if(!gotFix&&!chipTxt)document.getElementById('headChip').innerHTML='<span class="dot-live"></span> الموقع مفعّل';
-  if(chipTxt)document.getElementById('headChip').innerHTML=chipTxt;
-  gotFix=true;
-}
-
-function ingestFix(pos,src){
-  if(locked||manual)return;
-  const c=pos.coords;
-  const acc=c.accuracy==null?9999:c.accuracy;
-  const now=Date.now();
-  const fix={lat:c.latitude,lng:c.longitude,acc,spd:c.speed??null,src,ts:now};
-  samples.push(fix);
-  samples=samples.filter(s=>now-s.ts<=5000);
-  if(samples.length>12)samples.shift();
-  const bestRaw=samples.reduce((m,s)=>s.acc<m.acc?s:m,samples[0]);
-  let target=bestRaw;
-  if(bestFix&&bestRaw.acc>=bestFix.acc){
-    target=bestFix;
-    const win=samples.filter(s=>s.acc<=bestFix.acc*1.4+15&&s.src!=='ip');
-    if(win.length>=3){
-      const cm=win.reduce((s,x)=>s+x.lat,0)/win.length;
-      const cn=win.reduce((s,x)=>s+x.lng,0)/win.length;
-      if(distM([bestFix.lat,bestFix.lng],[cm,cn])<=40){
-        bestFix={lat:cm,lng:cn,acc:bestFix.acc,src:'gps-fused',ts:now};
-        target=bestFix;
+function applyFix(pos,fromWatch){
+  const{latitude:la,longitude:lo,accuracy,speed}=pos.coords;
+  lastAcc=accuracy;
+  if(!manual){
+    if(!gotFix&&map){
+      gotFix=true;
+      marker=L.marker([la,lo],{icon:pinIcon}).addTo(map);
+      accCircle=L.circle([la,lo],{radius:Math.max(accuracy,5),color:'#3E8EF7',weight:1.5,fillColor:'#3E8EF7',fillOpacity:.12}).addTo(map);
+      map.setView([la,lo],17);
+      setMapStatus(true,'موقعك ثابت — جاهز للإرسال');
+      document.getElementById('readyText').textContent='جاهز بدقة '+Math.round(accuracy)+' م';
+      document.getElementById('mapHint').textContent='تحديث حي مستمر';
+      document.getElementById('headChip').innerHTML='<span class="dot-live"></span> الموقع مفعّل';
+      document.getElementById('locText').innerHTML=`<svg class="ic"><use href="#i-signal"/></svg> خط العرض: <b class="loc-mono">${la.toFixed(6)}</b><br><svg class="ic"><use href="#i-signal"/></svg> خط الطول: <b class="loc-mono">${lo.toFixed(6)}</b><br><svg class="ic"><use href="#i-target"/></svg> الدقة: <b class="loc-mono">${Math.round(accuracy)}</b> م`;
+      dispatchPos={lat:la,lng:lo,manual:false};
+      toast('تم تحديد موقعك بدقة عالية');refineFix();
+    }else if(marker){
+      marker.setLatLng([la,lo]);if(accCircle)accCircle.setLatLng([la,lo]).setRadius(Math.max(accuracy,5));
+      if(!dispatchPos||!dispatchPos.manual){
+        dispatchPos={lat:la,lng:lo,manual:false};
+        document.getElementById('readyText').textContent='جاهز بدقة '+Math.round(accuracy)+' م';
+        document.getElementById('locText').innerHTML=`<svg class="ic"><use href="#i-signal"/></svg> خط العرض: <b class="loc-mono">${la.toFixed(6)}</b><br><svg class="ic"><use href="#i-signal"/></svg> خط الطول: <b class="loc-mono">${lo.toFixed(6)}</b><br><svg class="ic"><use href="#i-target"/></svg> الدقة: <b class="loc-mono">${Math.round(accuracy)}</b> م`;
+      }
+      if(fromWatch&&!document.getElementById('scHome').classList.contains('active')){
+        const spd=speed!=null&&speed>0?` — ${(speed*3.6).toFixed(0)} كم/س`:'';
+        document.getElementById('liveText').textContent='متابعة حية'+spd;
       }
     }
-  }else{
-    bestFix={lat:bestRaw.lat,lng:bestRaw.lng,acc:bestRaw.acc,src:bestRaw.src,ts:now};
-    target=bestFix;
-  }
-  lastAcc=target.acc;
-  stats.fixCount++;
-  if(target.acc<stats.best)stats.best=target.acc;
-  if(!stats.lockMs&&target.acc<=35&&!manual&&!locked){stats.lockMs=Date.now();stats.lockedAcc=target.acc;}
-  showFix(target);
-  markReady(target.acc);
-  dispatchPos={lat:target.lat,lng:target.lng,manual:false,accuracy:target.acc,source:target.src};
-  document.getElementById('locText').innerHTML=locHTML(target.lat,target.lng,target.acc,target.src);
-  saveLastKnown(target);
-  if(src!=='ip')ipFallbackUsed=false;
-  if(!document.getElementById('scHome').classList.contains('active')){
-    const spd=fix.spd!=null&&fix.spd>0?` — ${(fix.spd*3.6).toFixed(0)} كم/س`:'';
-    document.getElementById('liveText').textContent='متابعة حية'+spd;
-  }
-  scheduleRefine();
-  updatePrec();
-}
-
-function markReady(acc){
-  if(acc<=15){
-    setMapStatus(true,'GPS ممتاز — جاهز (±'+Math.round(acc)+' م)','ready');
-    document.getElementById('readyText').textContent='دقة ممتازة ±'+Math.round(acc)+' م';
-    document.getElementById('mapHint').textContent='تحديث حي مستمر';
-  }else if(acc<=35){
-    setMapStatus(true,'دقة جيدة — جاهز (±'+Math.round(acc)+' م)','ready');
-    document.getElementById('readyText').textContent='دقة جيدة ±'+Math.round(acc)+' م';
-    document.getElementById('mapHint').textContent='حافظ على الهاتف بثبات لتحسين الدقة';
-  }else if(acc<=100){
-    setMapStatus(true,'حسّن الدقة: اسحب الدبوس على مدخل الموقع','warn');
-    document.getElementById('readyText').textContent='دقة متوسطة ±'+Math.round(acc)+' م';
-    document.getElementById('mapHint').textContent='تحسّن الدقة تلقائياً الآن — أو اضبط الدبوس';
-  }else{
-    setMapStatus(false,'الدقة ضعيفة — يجب ضبط الدبوس','warn');
-    document.getElementById('readyText').textContent='الدقة ضعيفة ±'+Math.round(acc)+' م';
-    document.getElementById('mapHint').textContent='ابتعد عن المباني الكثيفة، أو ثبت الدبوس على موضع الحالة';
   }
 }
 
-function locHTML(la,lo,acc,src){return `<svg class="ic"><use href="#i-signal"/></svg> خط العرض: <b class="loc-mono">${la.toFixed(6)}</b><br><svg class="ic"><use href="#i-signal"/></svg> خط الطول: <b class="loc-mono">${lo.toFixed(6)}</b><br><svg class="ic"><use href="#i-target"/></svg> الدقة: <b class="loc-mono">±${Math.round(acc)} م</b> (${srcLabel(src)})`;}
-
-function currentPoint(){
-  if(dispatchPos&&dispatchPos.lat!=null)return [dispatchPos.lat,dispatchPos.lng];
-  if(marker)return [marker.getLatLng().lat,marker.getLatLng().lng];
-  return null;
-}
-function gmapsUrl(lat,lng){return 'https://www.google.com/maps/dir/?api=1&destination='+lat.toFixed(6)+','+lng.toFixed(6)+'&travelmode=driving';}
-function openGmaps(){
-  const pt=currentPoint();
-  if(!pt){toast('حدد الموقع أولاً — انتظر GPS أو اسحب الدبوس');return;}
-  window.open(gmapsUrl(pt[0],pt[1]),'_blank','noopener');
-}
-
-function useLastKnown(){
-  if(!lastKnown){return;}
-  const ageMin=Math.round((Date.now()-lastKnown.ts)/60000);
-  showFix({lat:lastKnown.lat,lng:lastKnown.lng,acc:lastKnown.acc+20,src:'last'},'<span class="dot-live"></span> آخر موقع معروف');
-  markReady(lastKnown.acc+20);
-  document.getElementById('locText').innerHTML=locHTML(lastKnown.lat,lastKnown.lng,lastKnown.acc+20,'last');
-  document.getElementById('mapHint').textContent='موقع تقديري — سيُجري GPS تصحيحاً فور توفره';
-  toast('عرضنا آخر موقع معروف لك ('+(ageMin<60?ageMin+' دقيقة':Math.round(ageMin/60)+' ساعة')+' مضت) — انتظر تحسين الدقة أو اضبط الدبوس');
-}
-
-function ipFallback(){
-  if(!navigator.onLine)return;
-  const ctrl=(typeof AbortController==='function')?new AbortController():null;
-  const to=setTimeout(()=>{if(ctrl)ctrl.abort();},8000);
-  fetch('https://ipapi.co/json/',ctrl?{signal:ctrl.signal}:undefined)
-    .then(r=>r.json())
-    .then(j=>{
-      clearTimeout(to);
-      if(gotFix||manual||locked||!j.latitude||!j.longitude)return;
-      ipFallbackUsed=true;
-      showFix({lat:j.latitude,lng:j.longitude,acc:5000,src:'ip'},'<span class="dot-live"></span> موقع تقريبي (شبكة)');
-      lastAcc=5000;
-      dispatchPos={lat:j.latitude,lng:j.longitude,manual:false,accuracy:5000,source:'ip'};
-      markReady(5000);
-      document.getElementById('locText').innerHTML=locHTML(j.latitude,j.longitude,5000,'ip');
-      setMapStatus(false,'موقع شبكة تقريبي — اسحب الدبوس للضبط','warn');
-      toast('تعذّر GPS — استخدمنا موقعك التقريبي من الشبكة. حرّك الدبوس لموضعك بالضبط');
-    })
-    .catch(()=>clearTimeout(to));
-}
-
-function scheduleRefine(){
-  clearTimeout(refineTimer);
-  refineTimer=setTimeout(()=>{if(!manual&&!locked&&bestFix&&bestFix.acc>20)refineFixLoop();},2200);
-}
-
-function refineFixLoop(){
-  if(manual||locked||!bestFix||bestFix.acc<=12||!navigator.geolocation)return;
-  navigator.geolocation.getCurrentPosition(p=>{
-    ingestFix(p,'gps-refine');
-    if(bestFix&&bestFix.acc>12&&!locked&&!manual)refineFixLoop();
-  },()=>{},{enableHighAccuracy:true,timeout:7000,maximumAge:0});
-}
-
-function updatePrec(){
-  const el=document.getElementById('precLine');if(!el)return;
-  const best=stats.best===Infinity?'—':'±'+Math.round(stats.best)+' م';
-  const now=Math.round((Date.now()-stats.start)/1000);
-  el.innerHTML='<svg class="ic"><use href="#i-target"/></svg> عينات دقة الموقع: <b>'+stats.fixCount+'</b> · أفضل دقة: <b>'+best+'</b> · جارٍ منذ: <b>'+now+' ث</b>'+(stats.lockMs?' · تثبّت بسرعة ±'+Math.round(stats.lockedAcc)+' م خلال '+Math.round((stats.lockMs-stats.start)/1000)+' ث':'');
-  el.style.display='flex';
-}
-
-function fetchAddr(lat,lng){
-  if(!navigator.onLine)return Promise.resolve('');
-  return fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&accept-language=ar&lat='+lat+'&lon='+lng)
-    .then(r=>r.json()).then(j=>(j.display_name||'').split(',').slice(0,3).join('،')).catch(()=>'');
-}
-
-const livePinCase=L.divIcon({className:'pin',html:'<div style="width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:linear-gradient(160deg,#F0454F,#DC1B30);border:3px solid #fff;box-shadow:0 4px 10px rgba(220,27,48,.4)"></div>',iconSize:[26,26],iconAnchor:[13,24]});
-const livePinAmb=L.divIcon({className:'pin',html:'<div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(160deg,#6FB1FF,#3E8EF7);border:3px solid #fff;box-shadow:0 4px 10px rgba(62,142,247,.4)"></div>',iconSize:[24,24],iconAnchor:[12,12]});
-
-function initLiveMap(){
-  const card=document.getElementById('liveCard');if(card)card.style.display='block';
-  const c=lastCaseId?RT.getCase(lastCaseId):null;
-  if(!c)return;
-  if(liveMap){liveMap.remove();liveMap=null;liveAmbMarker=null;liveCaseMarker=null;liveFit=false;}
-  liveMap=L.map('liveMap',{zoomControl:false,attributionControl:false}).setView(c.coords,13);
-  L.tileLayer(tileUrl(),{attribution:'© OSM © CARTO'}).addTo(liveMap);
-  liveCaseMarker=L.marker(c.coords,{icon:livePinCase}).addTo(liveMap);
-  try{const m=JSON.parse(localStorage.getItem(RT.KEY)||'null');if(m&&m.type==='amb-telemetry'&&m.payload&&m.payload.id===lastCaseId)applyLive(m.payload);}catch(e){}
-}
-
-function applyLive(t){
-  if(!liveMap||!t||t.id!==lastCaseId)return;
-  if(!liveAmbMarker){
-    liveAmbMarker=L.marker([t.lat,t.lng],{icon:livePinAmb}).addTo(liveMap);
-  }else{
-    liveAmbMarker.setLatLng([t.lat,t.lng]);
-  }
-  const s=document.getElementById('liveStatus'),h=document.getElementById('liveHint');
-  if(t.status==='arrived'){
-    if(s)s.innerHTML='<span class="dot-live"></span> المسعف وصل موقعك';
-    if(h)h.textContent='ابقي في مكانك — وصلت فرقة الإسعاف';
-  }else if(t.status==='enroute'){
-    if(s)s.innerHTML='<span class="dot-live"></span> المسعف في الطريق — ETA ≈ '+t.eta+' دقيقة';
-    if(h)h.textContent='فرقة الإسعاف تتحرك إليك الآن';
-  }
-  if(!liveFit||t.status==='arrived'){
-    liveFit=true;
-    try{liveMap.fitBounds(L.latLngBounds([t.lat,t.lng],liveCaseMarker.getLatLng()),{padding:[24,24]});}catch(e){}
-  }
-}
-
-RT.on('amb-telemetry',t=>applyLive(t));
-
-RT.on('case-removed',m=>{
-  if(m.id===lastCaseId){
-    lastCaseId=null;quickCaseId=null;
-    const s=document.getElementById('liveStatus');if(s)s.innerHTML='<span class="dot-live"></span> اكتمل البلاغ';
-    const h=document.getElementById('liveHint');if(h)h.textContent='العودة للرئيسية لبدء بلاغ جديد';
-  }
-});
-
-function runDemo(){
-  const ref=bestFix||lastKnown||{lat:21.5065,lng:39.1975};
-  const s=window.SELF_DATA||{};
-  const c={id:'c'+Date.now(),ts:Date.now(),kind:'quick',demo:true,
-    name:s.name||'خالد',age:s.age||'35',blood:s.blood||'O+',allergy:s.allergy||'لا يوجد',drugs:s.drugs||'لا يوجد',ops:s.ops||'لا يوجد',chronic:s.chronic||'لا يوجد',
-    relation:'بلاغ فوري',reporter:'المستخدم',
-    conds:['ألم في الصدر'],desc:'عرض تقديمي — ألم حاد في الصدر مع تعرّق',
-    priority:'crit',coords:[ref.lat+0.0012,ref.lng+0.0009],acc:6,posSrc:'gps',status:'جديد'};
-  RT.addCase(c);
-  quickCaseId=c.id;lastCaseId=c.id;
-  show('scDone');
-  initLiveMap();
-  updateTimeline('العرض التلقائي انطلق — البلاغ في الطريق إلى لوحة المسعف','موقع حي');
-  toast('العرض التلقائي يعمل… راقب خريطة المسعف وهي تتحرك');
-  fetchAddr(c.coords[0],c.coords[1]).then(a=>{if(a&&RT.getCase(c.id)&&!RT.getCase(c.id).addr)RT.updateCase(c.id,{addr:a});});
-}
+function refineFix(){navigator.geolocation.getCurrentPosition(p=>{if(p.coords.accuracy<lastAcc)applyFix(p,false);},()=>{},{enableHighAccuracy:true,timeout:6000,maximumAge:0});}
 
 const PIN_EDIT_ICON='<svg class="ic"><use href="#i-pin-edit"/></svg> تعديل الموقع';
 const PIN_EDITING_ICON='<svg class="ic"><use href="#i-pin-edit"/></svg> جارٍ التعديل…';
 
 function toggleManual(){
-  manual=!manual;const p=document.getElementById('manualPanel'),b=document.getElementById('manualBtn'),u=document.getElementById('undoBtn');
-  if(manual){p.classList.add('show');b.classList.add('on');b.innerHTML=PIN_EDITING_ICON;if(marker){marker.dragging.enable();marker.on('dragend',()=>setMapStatus(true,'اضغط تأكيد'));}setMapStatus(true,'اسحب الدبوس إلى موقع الحالة','warn');if(u)u.style.display='none';}
-  else{p.classList.remove('show');b.classList.remove('on');b.innerHTML=PIN_EDIT_ICON;if(marker)marker.dragging.disable();if(dispatchPos&&dispatchPos.manual)dispatchPos=null;if(u)u.style.display='none';setMapStatus(true,'تلقائي — متابعة حية');document.getElementById('readyText').textContent='تحديد تلقائي…';}
+  manual=!manual;const p=document.getElementById('manualPanel'),b=document.getElementById('manualBtn');
+  if(manual){p.classList.add('show');b.classList.add('on');b.innerHTML=PIN_EDITING_ICON;if(marker){marker.dragging.enable();marker.on('dragend',()=>setMapStatus(true,'اضغط تأكيد'));}setMapStatus(true,'اسحب الدبوس');}
+  else{p.classList.remove('show');b.classList.remove('on');b.innerHTML=PIN_EDIT_ICON;if(marker)marker.dragging.disable();if(dispatchPos&&dispatchPos.manual)dispatchPos=null;setMapStatus(false,'تلقائي — متابعة حية');document.getElementById('readyText').textContent='جاهز للإرسال';}
 }
 
 function confirmManual(){
   if(!marker)return;const p=marker.getLatLng();
-  dispatchPos={lat:p.lat,lng:p.lng,manual:true,accuracy:5,source:'manual'};manual=false;locked=true;
+  dispatchPos={lat:p.lat,lng:p.lng,manual:true};manual=false;
   document.getElementById('manualPanel').classList.remove('show');
   const b=document.getElementById('manualBtn');b.classList.remove('on');b.innerHTML=PIN_EDIT_ICON;
-  const u=document.getElementById('undoBtn');if(u)u.style.display='flex';
   if(marker)marker.dragging.disable();
-  setMapStatus(true,'موقع يدوي — جاهز','ready');
-  document.getElementById('locText').innerHTML=`<svg class="ic"><use href="#i-pin-edit"/></svg> يدويًا — خط العرض: <b class="loc-mono">${p.lat.toFixed(6)}</b><br><svg class="ic"><use href="#i-pin-edit"/></svg> يدويًا — خط الطول: <b class="loc-mono">${p.lng.toFixed(6)}</b><br><svg class="ic"><use href="#i-check-circle"/></svg> محدّد بإصبعك — دقة عالية`;
+  setMapStatus(true,'موقع يدوي — جاهز');
+  document.getElementById('locText').innerHTML=`<svg class="ic"><use href="#i-pin-edit"/></svg> يدويًا — خط العرض: <b class="loc-mono">${p.lat.toFixed(6)}</b><br><svg class="ic"><use href="#i-pin-edit"/></svg> يدويًا — خط الطول: <b class="loc-mono">${p.lng.toFixed(6)}</b>`;
   document.getElementById('readyText').textContent='يدوي — مدخل الموقع';
-  document.getElementById('mapHint').textContent='مضبوط يدوياً، المسعف يعتمد عليه';
-  document.getElementById('headChip').innerHTML='<span class="dot-live"></span> الموقع اليدوي';
-  toast('تم تثبيت الموقع على الدبوس — اطمئن، لن يعود لمكانه');
+  document.getElementById('mapHint').textContent='مضبوط يدوياً';
+  document.getElementById('headChip').innerHTML='<span class="dot-live"></span> الموقع يدوي';
+  toast('تم تثبيت الموقع على الدبوس');
 }
 
-function undoManual(){
-  locked=false;manual=false;
-  const p=document.getElementById('manualPanel');if(p)p.classList.remove('show');
-  const b=document.getElementById('manualBtn');if(b){b.classList.remove('on');b.innerHTML=PIN_EDIT_ICON;}
-  const u=document.getElementById('undoBtn');if(u)u.style.display='none';
-  if(marker)marker.dragging.disable();
-  dispatchPos=null;
-  document.getElementById('headChip').innerHTML='<span class="dot-live"></span> تحديد تلقائي';
-  document.getElementById('mapHint').textContent='متابعة حية — سيُحدّث الموقع الآن';
-  setMapStatus(false,'متابعة حية — جارٍ جلب موقعك…');
-  document.getElementById('readyText').textContent='تحديد الموقع تلقائياً…';
-  returnToLive();
-  toast('عُدنا للتحديد التلقائي — جارٍ جلب موقعك الحالي');
-}
-function returnToLive(){
-  const apply=f=>{
-    showFix(f);
-    markReady(f.acc);
-    document.getElementById('locText').innerHTML=locHTML(f.lat,f.lng,f.acc,f.src);
-    setMapStatus(true,'تلقائي — متابعة حية');
-    if(map&&map.setView)map.setView([f.lat,f.lng],17);
-  };
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(pos=>ingestFix(pos,'gps-live'),err=>{
-      if(bestFix)apply(bestFix);else if(lastKnown)apply({lat:lastKnown.lat,lng:lastKnown.lng,acc:lastKnown.acc+20,src:'last'});
-    },{enableHighAccuracy:true,timeout:8000,maximumAge:0});
-  }
-  if(watchId==null)startWatch();
-  if(bestFix)apply(bestFix);
-}
-
-function getReadyPos(){
-  return new Promise(res=>{
-    if(dispatchPos&&(dispatchPos.manual||dispatchPos.accuracy<=80)){res(dispatchPos);return;}
-    if(!navigator.geolocation){res(dispatchPos||bestFix||lastKnown||null);return;}
-    navigator.geolocation.getCurrentPosition(p=>{
-      const acc=p.coords.accuracy==null?9999:p.coords.accuracy;
-      if(!dispatchPos||dispatchPos.manual||acc<=dispatchPos.accuracy){dispatchPos={lat:p.coords.latitude,lng:p.coords.longitude,manual:false,accuracy:acc,source:'gps-final'};}
-      if(acc>0)ingestFix(p,'gps-final');
-      res(dispatchPos||bestFix||lastKnown);
-    },()=>{res(dispatchPos||bestFix||lastKnown||null);},{enableHighAccuracy:true,timeout:8000,maximumAge:0});
-  });
-}
-
-function startReport(){
-  getReadyPos().then(pos=>{
-    if(!pos){toast('المكان لم يتحدد بعد — انتظر الـGPS أو اضبط الدبوس');return;}
-    const s=window.SELF_DATA||{};
-    if(!pos.manual&&pos.accuracy>100)toast('الدقة منخفضة (±'+Math.round(pos.accuracy)+' م) — اضبط الدبوس على الموقع الفعلي أولاً إذا أمكن');
-    const c={
-      id:'c'+Date.now(),ts:Date.now(),kind:'quick',
-      name:s.name||'مستعجل',age:s.age||'—',
-      blood:s.blood||'—',allergy:s.allergy||'لا يوجد',drugs:s.drugs||'لا يوجد',ops:s.ops||'لا يوجد',chronic:s.chronic||'لا يوجد',
-      relation:'بلاغ فوري',reporter:'المستخدم',
-      conds:['حالة أخرى'],desc:'ضغط زر الطوارئ — الموقع أُرسل فوراً، التفاصيل قادمة',
-      priority:'stable',coords:[pos.lat,pos.lng],acc:Math.round(pos.accuracy||0),posSrc:pos.source||'gps',status:'جديد',
-      place:dispatchPos&&dispatchPos.place?dispatchPos.place:null
-    };
-    RT.addCase(c);
-    quickCaseId=c.id;
-    lastCaseId=c.id;
-    show('scReport');
-    updateTimeline('زر الطوارئ — أُرسل الموقع للمسعف فوراً','موقع فوري');
-    toast('أُرسل موقعك للمسعف على الفور');
-    fetchAddr(pos.lat,pos.lng).then(a=>{
-      if(a&&quickCaseId)RT.updateCase(quickCaseId,{addr:a});
-      const al=document.getElementById('locAddr');
-      if(al)al.innerHTML=a?`<svg class="ic"><use href="#i-home"/></svg> ${a}`:'<svg class="ic"><use href="#i-home"/></svg> جارٍ تحديد العنوان…';
-    });
-    document.getElementById('desc').addEventListener('input',onDescInput);
-  });
-}
-function condTap(el,i){el.classList.toggle('sel');updateTimeline(`الحالة: ${CONDITIONS[i].t}`,'للمسعف');toast(`تم إرسال: ${CONDITIONS[i].t}`);syncCase();}
-
-function syncCase(){
-  if(!quickCaseId)return;
-  const cur=RT.getCase(quickCaseId);if(!cur)return;
-  const patch={};
-  if(pickedKind)patch.kind=pickedKind;
-  if(selectedPerson){
-    const p=selectedPerson;
-    patch.name=p.name||cur.name;
-    patch.age=p.age||'—';
-    patch.blood=p.blood||cur.blood||'—';
-    patch.allergy=p.allergy||cur.allergy||'لا يوجد';
-    patch.drugs=p.drugs||cur.drugs||'لا يوجد';
-    patch.ops=p.ops||cur.ops||'لا يوجد';
-    patch.chronic=p.chronic||cur.chronic||'لا يوجد';
-    patch.relation=pickedKind==='self'?'أنت':(pickedKind==='family'?(p.relation||'أحد أفراد العائلة'):'صديقي');
-    patch.reporter=pickedKind==='self'?'المستخدم نفسه':p.name;
-  }
-  const conds=[...document.querySelectorAll('#condsBox .cond.sel')].map(b=>b.textContent.trim());
-  patch.conds=conds.length?conds:(cur.conds||['حالة أخرى']);
-  const dv=document.getElementById('desc').value.trim();
-  patch.desc=dv?dv:(cur.desc||'لا يوجد وصف إضافي');
-  patch.priority=RT.priorityFor(patch.conds);
-  RT.updateCase(quickCaseId,patch);
-}
-
-let descTimer=null;
-function onDescInput(){
-  clearTimeout(descTimer);
-  descTimer=setTimeout(syncCase,400);
-}
+function startReport(){show('scReport');toast('تم إرسال موقعك للمسعف على الفور');}
+function condTap(el,i){el.classList.toggle('sel');updateTimeline(`الحالة: ${CONDITIONS[i].t}`,'للمسعف');toast(`تم إرسال: ${CONDITIONS[i].t}`);}
 
 function pickKind(el,kind){
   pickedKind=kind;
-  selectedPerson=null;
   document.querySelectorAll('#kindIds .id').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');
   document.getElementById('profileBox').classList.add('hidden');
-  const famList=document.getElementById('famList');
-  if(kind==='self'){
-    famList.classList.add('hidden');famList.innerHTML='';
-    const s=window.SELF_DATA||{};
-    selectedPerson={self:true,relation:'أنت',name:s.name||'أنت',age:s.age||'',blood:s.blood||'—',drugs:s.drugs||'—',allergy:s.allergy||'—',ops:s.ops||'—',chronic:s.chronic||'—'};
-    showPersonProfile();
-    toast('تم تحديد: أنت');updateTimeline('بروفايل الحالة: أنت','أُرسل');
-  }else{
+  const famList=document.getElementById('famList'),tapBox=document.getElementById('tapBox');
+  if(kind==='family'){
+    tapBox.classList.add('hidden');tapBox.innerHTML='';
     famList.classList.remove('hidden');
-    renderScenList(famList,kind==='family'?famListItems():friendListItems(),kind);
+    famList.innerHTML=FAMILY.map((p,i)=>`<button class="id" onclick="pickFamily(this,${i})"><span class="ico"><svg class="ic"><use href="#${p.ico}"/></svg></span> ${p.relation} <small class="id-age">${p.age} سنة</small></button>`).join('');
+  }else{
+    famList.classList.add('hidden');famList.innerHTML='';
+    tapBox.classList.remove('hidden');
+    resetTap();
   }
-  syncCase();
 }
 
-function famListItems(){
-  return (window.SCENARIO_FAMILY||[]).filter(p=>p.name!==CURRENT_IDENTITY).map(p=>Object.assign({self:false},p,{relation:p.relation||'أحد أفراد العائلة',ico:p.ico||'i-users'}));
+function pickFamily(el,i){
+  document.querySelectorAll('#famList .id').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');
+  const p=FAMILY[i],box=document.getElementById('profileBox');box.classList.remove('hidden');
+  box.innerHTML=`<div class="name">${p.name}</div><svg class="ic"><use href="#i-user"/></svg> العمر: <b class="blood-mono">${p.age}</b><br><svg class="ic"><use href="#i-drop"/></svg> فصيلة الدم: <b class="blood-mono">${p.blood}</b><br><svg class="ic"><use href="#i-pill"/></svg> الأدوية: <b>${p.drugs}</b><br><svg class="ic"><use href="#i-alert"/></svg> الحساسية: <b>${p.allergy}</b><br><svg class="ic"><use href="#i-clipboard"/></svg> آخر عملية: <b>${p.ops}</b><br><svg class="ic"><use href="#i-clipboard"/></svg> الأمراض المزمنة: <b>${p.chronic}</b>`;
+  toast(`تم تحويل الملف إلى: ${p.name.split('—')[1]||p.name}`);updateTimeline(`بروفايل الحالة: ${p.name}`,'أُرسل');
 }
 
-function getFriends(){
-  const base=window.SCENARIO_FRIENDS||[];
-  let added=[];
-  try{added=JSON.parse(localStorage.getItem('asafni_friends')||'[]');}catch(e){added=[];}
-  return added.concat(base);
-}
-function setFriends(a){localStorage.setItem('asafni_friends',JSON.stringify(a.filter(f=>f._added)));}
-function friendListItems(){return getFriends().filter(p=>p.name!==CURRENT_IDENTITY).map(p=>Object.assign({self:false,relation:'صديقي'},p,{ico:'i-friends'}));}
-
-function renderScenList(box,list,kind){
-  const addRow=kind==='friend'?`<button class="id" onclick="openAddFriend()"><span class="ico"><svg class="ic"><use href="#i-plus"/></svg></span> إضافة صديق <small class="id-age">أُضِفه بسجل كامل</small></button>`:'';
-  const empty=!list.length?'<div class="empty">لا يوجد أفراد في هذه القائمة بعد — أضفهم من ملف السيناريوهات</div>':'';
-  const rows=(addRow?[addRow]:[]).concat(list.map((p,i)=>{
-    const del=p._added?`<span class="friend-del" onclick="event.stopPropagation();delFriend('${p._id}')" title="حذف">✕</span>`:'';
-    return `<button class="id" onclick="${kind==='friend'?'pickFriends(this,'+i+')':'pickFamily(this,'+i+')'}"><span class="ico"><svg class="ic"><use href="#${p.ico||'i-users'}"/></svg></span> ${p.name}${del}<small class="id-age">${p.age?p.age+' سنة':'ملف شخصي'}</small></button>`;
-  })).join('');
-  box.innerHTML=rows+empty;
+function resetTap(){
+  document.getElementById('tapBox').innerHTML=`
+    <div class="tap-anim"><span class="tap-ring"></span><span class="tap-ring r2"></span><span class="tap-ring r3"></span><span class="tap-ico"><svg class="ic"><use href="#i-tap"/></svg></span></div>
+    <p class="tap-txt" id="tapTxt">قرّب هاتفك من هاتف المصاب لالتقاط بطاقته الإسعافية تلقائيًا — بنفس فكرة الدفع اللاتلامسي</p>
+    <button class="btn tap-btn" id="tapBtn" onclick="runTap()">محاكاة الالتقاط الآن</button>`;
 }
 
-function pickFamily(el,i){const p=famListItems()[i];if(p)pickScen(el,p);}
-function pickFriends(el,i){const p=friendListItems()[i];if(p)pickScen(el,p);}
-
-function pickScen(el,p){
-  document.querySelectorAll('#famList .id').forEach(b=>b.classList.remove('sel'));if(el)el.classList.add('sel');
-  selectedPerson=p;
-  showPersonProfile();
-  toast('تم اختيار: '+p.name);updateTimeline('بروفايل الحالة: '+p.name,'أُرسل');
-  syncCase();
+function runTap(){
+  const btn=document.getElementById('tapBtn'),txt=document.getElementById('tapTxt');
+  if(!btn)return;
+  btn.disabled=true;btn.textContent='جارٍ القراءة…';
+  let dots=0;
+  const iv=setInterval(()=>{dots=(dots+1)%4;txt.textContent='جارٍ القراءة'+'.'.repeat(dots);},220);
+  setTimeout(()=>{clearInterval(iv);showBloodReveal();},1500);
 }
 
-function showPersonProfile(){
-  const p=selectedPerson;if(!p)return;
+function showBloodReveal(){
+  document.getElementById('tapBox').innerHTML=`
+    <div class="blood-reveal">
+      <div class="blood-badge">${NEARBY_STRANGER.blood}</div>
+      <div style="font-size:13px;font-weight:800">${NEARBY_STRANGER.name}</div>
+      <div style="font-size:11.5px;color:var(--muted)">${NEARBY_STRANGER.age} سنة</div>
+    </div>
+    <div class="tap-note"><svg class="ic"><use href="#i-lock"/></svg> لحماية خصوصيته تُعرض فصيلة الدم فقط الآن — سجله الطبي الكامل يصل تلقائيًا للمسعف عند إرسال البلاغ.</div>
+    <button class="btn tap-btn" onclick="confirmNearby()">متابعة البلاغ</button>`;
+}
+
+function confirmNearby(){
   const box=document.getElementById('profileBox');box.classList.remove('hidden');
-  box.innerHTML=`<div class="name">${p.name}</div><svg class="ic"><use href="#i-user"/></svg> العمر: <b class="blood-mono">${p.age||'—'}</b><br><svg class="ic"><use href="#i-drop"/></svg> فصيلة الدم: <b class="blood-mono">${p.blood||'—'}</b><br><svg class="ic"><use href="#i-pill"/></svg> الأدوية: <b>${p.drugs||'—'}</b><br><svg class="ic"><use href="#i-alert"/></svg> الحساسية: <b>${p.allergy||'—'}</b><br><svg class="ic"><use href="#i-clipboard"/></svg> آخر عملية: <b>${p.ops||'—'}</b><br><svg class="ic"><use href="#i-clipboard"/></svg> الأمراض المزمنة: <b>${p.chronic||'—'}</b>`;
+  box.innerHTML=`<div class="name">${NEARBY_STRANGER.name}</div><svg class="ic"><use href="#i-user"/></svg> العمر: <b class="blood-mono">${NEARBY_STRANGER.age}</b><br><svg class="ic"><use href="#i-drop"/></svg> فصيلة الدم: <b class="blood-mono">${NEARBY_STRANGER.blood}</b><br><svg class="ic"><use href="#i-lock"/></svg> باقي بياناته الطبية تصل للمسعف مباشرة عند إرسال البلاغ`;
+  toast('تم التقاط البطاقة — فصيلة الدم: '+NEARBY_STRANGER.blood);
+  updateTimeline('بلاغ عن شخص بالقرب — فصيلة '+NEARBY_STRANGER.blood,'أُرسل');
 }
 
-function openAddFriend(){
-  ['frName','frAge','frBlood','frAllergy','frDrugs','frChronic','frOps'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-  showModal('addFriendModal');
-}
-
-function saveFriend(){
-  const g=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
-  const name=g('frName');
-  if(!name){toast('اكتب اسم الصديق');return;}
-  const f={_id:'f'+Date.now(),_added:true,name,age:g('frAge'),blood:g('frBlood')||'—',allergy:g('frAllergy')||'لا يوجد',drugs:g('frDrugs')||'لا يوجد',ops:g('frOps')||'لا يوجد',chronic:g('frChronic')||'لا يوجد'};
-  const a=getFriends().filter(x=>x._added);
-  a.unshift(f);
-  setFriends(a);
-  closeModal('addFriendModal');
-  renderScenList(document.getElementById('famList'),friendListItems(),'friend');
-  toast('أُضيف «'+name+'» إلى قائمة أصدقائك');
-}
-
-function delFriend(id){
-  setFriends(getFriends().filter(f=>f._id!==id));
-  if(selectedPerson&&selectedPerson._id===id){selectedPerson=null;document.getElementById('profileBox').classList.add('hidden');}
-  renderScenList(document.getElementById('famList'),friendListItems(),'friend');
-  syncCase();
-  toast('تم حذف الصديق');
-}
-
-function openRecord(){
-  const s=window.SELF_DATA||{},d=v=>v||'—';
-  document.getElementById('recordFields').innerHTML=`
-    <div class="field"><span>العمر</span><b class="blood-mono">${d(s.age)} سنة</b></div>
-    <div class="field"><span>فصيلة الدم</span><b class="blood-mono">${d(s.blood)}</b></div>
-    <div class="field"><span>الحساسية</span><b>${d(s.allergy)}</b></div>
-    <div class="field"><span>الأمراض المزمنة</span><b>${d(s.chronic)}</b></div>
-    <div class="field"><span>الأدوية الحالية</span><b>${d(s.drugs)}</b></div>
-    <div class="field"><span>آخر عملية</span><b>${d(s.ops)}</b></div>`;
-  showModal('recordModal');
-}
-
-function openCard(){
-  const s=window.SELF_DATA||{},d=v=>v||'—';
-  document.getElementById('cardNameSlot').textContent=s.name||'أنت';
-  document.getElementById('cardAgeSlot').textContent=d(s.age);
-  document.getElementById('cardBloodSlot').textContent=d(s.blood);
-  document.getElementById('cardAllergySlot').textContent=(s.allergy&&s.allergy!=='لا يوجد')?'نعم':'لا';
-  showModal('cardModal');
-}
+function openRecord(){showModal('recordModal');}
+function openCard(){showModal('cardModal');}
 
 function addToWallet(){
   const btn=document.getElementById('walletBtn');
@@ -1165,30 +706,9 @@ function addToWallet(){
 }
 
 function sendReport(){
-  if(!quickCaseId){toast('اضغط زر الطوارئ أولاً');return;}
-  syncCase();
-  updateTimeline('تم إنهاء البلاغ — لوحة المسعف محدّثة نهائياً','موقع + حالة');
-  show('scDone');
-  initLiveMap();
-  renderCaseStatus();
-  toast('وصل البلاغ كاملاً للمسعف');
+  if(!pickedKind){toast('اختر مين الشخص المبلّغ عنه أولاً');return;}
+  updateTimeline('البلاغ أُرسل بنجاح','موقع + حالة');show('scDone');toast('المسعف في الطريق');
 }
-
-function renderCaseStatus(){
-  const el=document.getElementById('liveStatusLine');if(!el)return;
-  const c=lastCaseId?RT.getCase(lastCaseId):null;
-  if(!c){el.textContent='في انتظار وصول المسعف';return;}
-  const map={'جديد':'المسعف قادم','تم القبول':'المسعف قبِل البلاغ','في الطريق':'المسعف في الطريق إليك','وصل الموقع':'المسعف وصل الموقع'};
-  el.textContent=map[c.status]||c.status;
-}
-
-RT.on('case-update',c=>{
-  if(c.id!==lastCaseId)return;
-  renderCaseStatus();
-  if(liveMap&&liveCaseMarker)liveCaseMarker.setLatLng(c.coords);
-  const a=document.getElementById('locAddr');
-  if(a&&c.addr)a.innerHTML='<svg class="ic"><use href="#i-home"/></svg> '+c.addr;
-});
 
 function updateTimeline(txt,tag){
   const tl=document.getElementById('timeline'),t=new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
@@ -1197,23 +717,15 @@ function updateTimeline(txt,tag){
 
 function fakeCall(){const btn=event.target.closest('button')||event.target;const ic='<svg class="ic"><use href="#i-phone"/></svg> ';btn.innerHTML=ic+'جارٍ الاتصال…';setTimeout(()=>toast('تم الاتصال، انتظر بجانب الحالة'),900);setTimeout(()=>btn.innerHTML=ic+'الاتصال بالمسعف',2600);}
 
-function notifyRelative(){
-  const who=(selectedPerson&&!selectedPerson.self&&selectedPerson.name)||(window.SELF_DATA||{}).name||'';
-  const target=who?('أقارب '+who):'أحد أقارب هذا الشخص';
-  const b=document.getElementById('notifyRelBtn');
-  if(b){b.disabled=true;b.classList.add('sent');b.innerHTML='<svg class="ic"><use href="#i-check-circle"/></svg> أُرسلت رسالة إلى '+target;}
-  toast('أُرسلت رسالة إلى '+target+' ✓','محاكاة اختصار — لا تُرسل رسالة حقيقية');
-  updateTimeline('أُرسلت رسالة إلى '+target,'للأقارب');
-}
-
-function setMapStatus(ok,txt,cls){const el=document.getElementById('mapStatus');el.className='map-status '+(cls||(ok?'ready':'wait'));el.innerHTML='<span class="dot-live"></span> '+txt;}
+function setMapStatus(ok,txt){const el=document.getElementById('mapStatus');el.className='map-status '+(ok?'ready':'wait');el.innerHTML='<span class="dot-live"></span> '+txt;}
 
 function toast(msg,sub){const s=document.getElementById('snack');s.innerHTML=msg+(sub?`<small>${sub}</small>`:'');s.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>s.classList.remove('show'),2600);}
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
 function goHome(){
   show('scHome');document.querySelectorAll('.id').forEach(b=>b.classList.remove('sel'));document.getElementById('profileBox').classList.add('hidden');document.getElementById('desc').value='';document.querySelectorAll('.saved-chip').forEach(c=>c.classList.remove('active'));
-  pickedKind=null;selectedPerson=null;
+  pickedKind=null;
   const famList=document.getElementById('famList');famList.classList.add('hidden');famList.innerHTML='';
+  const tapBox=document.getElementById('tapBox');tapBox.classList.add('hidden');tapBox.innerHTML='';
 }
 
 function openMenu(){showModal('menuModal');}
@@ -1242,9 +754,7 @@ function renderPlaces(){
 
 function usePlace(id){
   const p=getPlaces().find(x=>x.id===id);if(!p)return;
-  dispatchPos={lat:p.lat,lng:p.lng,manual:true,accuracy:5,source:'place',place:p};
-  locked=true;manual=false;
-  const u=document.getElementById('undoBtn');if(u)u.style.display='flex';
+  dispatchPos={lat:p.lat,lng:p.lng,manual:true,place:p};
   if(marker)marker.setLatLng([p.lat,p.lng]);if(accCircle)accCircle.setLatLng([p.lat,p.lng]).setRadius(5);
   map.setView([p.lat,p.lng],18);
   closeModal('placesModal');
