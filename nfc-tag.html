@@ -225,7 +225,7 @@
 
   <div class="status-box hidden" id="statusBox">
     <div class="sb-head"><span class="dot-live"></span> تحديثات البلاغ — مباشر</div>
-    <div class="track-line wait" id="trackLine"><span class="dot-live"></span> بانتظار قبول المسعف…</div>
+    <div class="track-line wait" id="trackLine"><span class="dot-live"></span> المسعف قادم</div>
     <div class="track-eta" id="trackEta"></div>
     <div class="steps" id="trackSteps"></div>
   </div>
@@ -510,7 +510,7 @@ function renderTrack(){
     line.innerHTML='<svg class="ic"><use href="#i-check-circle"/></svg> المسعف قبِل البلاغ — جاهز للتحرك';
   }else{
     line.className='track-line wait';
-    line.innerHTML='<span class="dot-live"></span> بانتظار قبول المسعف…';
+    line.innerHTML='<span class="dot-live"></span> المسعف قادم';
   }
   const eta=document.getElementById('trackEta');
   let etaHtml='';

@@ -467,8 +467,7 @@
       <div class="ids" id="kindIds">
         <button class="id" onclick="pickKind(this,'self')"><span class="ico"><svg class="ic"><use href="#i-user"/></svg></span> أنا — نفسي</button>
         <button class="id" onclick="pickKind(this,'family')"><span class="ico"><svg class="ic"><use href="#i-users"/></svg></span> أحد أفراد عائلتي</button>
-        <button class="id" onclick="pickKind(this,'friend')"><span class="ico"><svg class="ic"><use href="#i-friends"/></svg></span> صديقي</button>
-      </div>
+        </div>
 
       <div class="ids fam-ids hidden" id="famList"></div>
 
@@ -490,11 +489,11 @@
         <h2>تم إرسال البلاغ</h2>
         <p>المسعف يستلم الآن الموقع والبروفايل الصحي + حالة الحالة</p>
       </div>
-      <div class="live" style="display:flex;justify-content:center;margin-top:12px"><span class="dot-live"></span> <span id="liveStatusLine">بانتظار قبول المسعف…</span></div>
+      <div class="live" style="display:flex;justify-content:center;margin-top:12px"><span class="dot-live"></span> <span id="liveStatusLine">المسعف قادم</span></div>
     </div>
     <div class="map-card" id="liveCard" style="display:none">
       <div id="liveMap"></div>
-      <div class="map-status wait" id="liveStatus"><span class="dot-live"></span> بانتظار انطلاق المسعف…</div>
+      <div class="map-status wait" id="liveStatus"><span class="dot-live"></span> المسعف قادم</div>
       <div class="map-hint" id="liveHint">مراقبة موقع المسعف لحظياً</div>
       <button class="layers-btn" id="layerBtnLive" onclick="toggleBase()"><svg class="ic"><use href="#i-layers"/></svg> أقمار صناعية</button>
     </div>
@@ -1179,7 +1178,7 @@ function renderCaseStatus(){
   const el=document.getElementById('liveStatusLine');if(!el)return;
   const c=lastCaseId?RT.getCase(lastCaseId):null;
   if(!c){el.textContent='في انتظار وصول المسعف';return;}
-  const map={'جديد':'بانتظار قبول المسعف…','تم القبول':'المسعف قبِل البلاغ','في الطريق':'المسعف في الطريق إليك','وصل الموقع':'المسعف وصل الموقع'};
+  const map={'جديد':'المسعف قادم','تم القبول':'المسعف قبِل البلاغ','في الطريق':'المسعف في الطريق إليك','وصل الموقع':'المسعف وصل الموقع'};
   el.textContent=map[c.status]||c.status;
 }
 

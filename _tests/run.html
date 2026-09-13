@@ -174,7 +174,7 @@
       // === خانة تحديثات البلاغ (حالة المسعف) ===
       rec(!!nd.getElementById('statusBox'),'NFC-TAG: خانة التحديثات موجودة في صفحة NFC');
       rec(!nd.getElementById('statusBox').classList.contains('hidden'),'NFC-TAG: خانة التحديثات تظهر بعد إرسال البلاغ');
-      rec(nd.getElementById('trackLine').textContent.indexOf('بانتظار قبول')>-1,'NFC-TAG: تبدأ رسالة «بانتظار قبول المسعف»');
+      rec(nd.getElementById('trackLine').textContent.indexOf('المسعف قادم')>-1,'NFC-TAG: تبدأ رسالة «المسعف قادم»');
       rec(nd.querySelectorAll('#trackSteps .step.on').length===1,'NFC-TAG: مرحلة «قبول البلاغ» نشطة أولاً');
       // محاكاة قبول المسعف (عبر لوحته)
       var pwin=document.getElementById('fPara').contentWindow;
