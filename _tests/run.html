@@ -71,7 +71,8 @@
     await sleep(200);
     rec(!ud.getElementById('profileBox').classList.contains('hidden')&&ud.getElementById('profileBox').textContent.indexOf('O+')>-1,'INDEX: البروفايل الذاتي يعرض فصيلة الدم');
 
-    // إرسال البلاغ النهائي
+    // إرسال البلاغ النهائي (بعد ضبط الموقع يدوياً بدل GPS)
+    u.dispatchPos={lat:21.497,lng:39.2444,manual:true};
     u.sendReport();
     await sleep(300);
     rec(ud.querySelector('#scDone').classList.contains('active'),'INDEX: الإرسال يفتح شاشة النتيجة scDone');

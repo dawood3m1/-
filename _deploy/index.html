@@ -534,6 +534,8 @@
   </div>
 </div>
 
+<script src="firebase-config.js"></script>
+<script src="realtime.js"></script>
 <script>
 const CONDITIONS=[{icon:"i-zzz",t:"مغمى عليه"},{icon:"i-target",t:"دوخة / دوار"},{icon:"i-drop",t:"نزيف"},{icon:"i-heart",t:"ألم في الصدر"},{icon:"i-wind",t:"صعوبة تنفس"},{icon:"i-bolt",t:"نوبة تشنجية"},{icon:"i-head",t:"إصابة رأس"},{icon:"i-alert",t:"حالة أخرى"}];
 
@@ -545,7 +547,7 @@ const FAMILY=[
 ];
 const NEARBY_STRANGER={name:"خالد إبراهيم العتيبي",age:41,blood:"A-"};
 
-let pickedKind=null,selectedId=0,map=null,marker=null,accCircle=null,watchId=null,gotFix=false;
+let pickedKind=null,pickedPerson=null,lastCaseId=null,selectedId=0,map=null,marker=null,accCircle=null,watchId=null,gotFix=false;
 let manual=false,dispatchPos=null,lastAcc=Infinity;
 let saveMap=null,saveMarker=null,placeType='منزل',placePhoto=null;
 let theme=localStorage.getItem('asafni_theme')||'dark';
@@ -637,6 +639,7 @@ function condTap(el,i){el.classList.toggle('sel');updateTimeline(`الحالة: 
 
 function pickKind(el,kind){
   pickedKind=kind;
+  pickedPerson=null;
   document.querySelectorAll('#kindIds .id').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');
   document.getElementById('profileBox').classList.add('hidden');
   const famList=document.getElementById('famList'),tapBox=document.getElementById('tapBox');
@@ -654,6 +657,7 @@ function pickKind(el,kind){
 function pickFamily(el,i){
   document.querySelectorAll('#famList .id').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');
   const p=FAMILY[i],box=document.getElementById('profileBox');box.classList.remove('hidden');
+  pickedPerson=p;
   box.innerHTML=`<div class="name">${p.name}</div><svg class="ic"><use href="#i-user"/></svg> العمر: <b class="blood-mono">${p.age}</b><br><svg class="ic"><use href="#i-drop"/></svg> فصيلة الدم: <b class="blood-mono">${p.blood}</b><br><svg class="ic"><use href="#i-pill"/></svg> الأدوية: <b>${p.drugs}</b><br><svg class="ic"><use href="#i-alert"/></svg> الحساسية: <b>${p.allergy}</b><br><svg class="ic"><use href="#i-clipboard"/></svg> آخر عملية: <b>${p.ops}</b><br><svg class="ic"><use href="#i-clipboard"/></svg> الأمراض المزمنة: <b>${p.chronic}</b>`;
   toast(`تم تحويل الملف إلى: ${p.name.split('—')[1]||p.name}`);updateTimeline(`بروفايل الحالة: ${p.name}`,'أُرسل');
 }
@@ -687,6 +691,7 @@ function showBloodReveal(){
 
 function confirmNearby(){
   const box=document.getElementById('profileBox');box.classList.remove('hidden');
+  pickedPerson=NEARBY_STRANGER;
   box.innerHTML=`<div class="name">${NEARBY_STRANGER.name}</div><svg class="ic"><use href="#i-user"/></svg> العمر: <b class="blood-mono">${NEARBY_STRANGER.age}</b><br><svg class="ic"><use href="#i-drop"/></svg> فصيلة الدم: <b class="blood-mono">${NEARBY_STRANGER.blood}</b><br><svg class="ic"><use href="#i-lock"/></svg> باقي بياناته الطبية تصل للمسعف مباشرة عند إرسال البلاغ`;
   toast('تم التقاط البطاقة — فصيلة الدم: '+NEARBY_STRANGER.blood);
   updateTimeline('بلاغ عن شخص بالقرب — فصيلة '+NEARBY_STRANGER.blood,'أُرسل');
@@ -707,7 +712,52 @@ function addToWallet(){
 
 function sendReport(){
   if(!pickedKind){toast('اختر مين الشخص المبلّغ عنه أولاً');return;}
-  updateTimeline('البلاغ أُرسل بنجاح','موقع + حالة');show('scDone');toast('المسعف في الطريق');
+  if(!dispatchPos){toast('المكان لم يتحدد بعد — انتظر الـGPS أو اضبط الدبوس ثم أعد المحاولة');return;}
+  const p=pickedPerson||{name:'مستعجل',relation:'بلاغ',age:'—',blood:'—',allergy:'لا يوجد',drugs:'لا يوجد',ops:'لا يوجد',chronic:'لا يوجد'};
+  const conds=[...document.querySelectorAll('#condsBox .cond.sel')].map(b=>b.textContent.trim());
+  const desc=document.getElementById('desc').value.trim();
+  const c={
+    id:'c'+Date.now(),ts:Date.now(),kind:pickedKind,
+    name:p.name||'مستعجل',age:p.age||'—',blood:p.blood||'—',
+    allergy:p.allergy||'لا يوجد',drugs:p.drugs||'لا يوجد',ops:p.ops||'لا يوجد',chronic:p.chronic||'لا يوجد',
+    relation:p.relation||'بروفايل',reporter:p.name||'المستخدم',
+    conds:conds.length?conds:['حالة أخرى'],
+    desc:desc||'لا يوجد وصف إضافي',
+    priority:window.RT&&RT.priorityFor?RT.priorityFor(conds):'stable',
+    coords:[dispatchPos.lat,dispatchPos.lng],
+    acc:Math.round(lastAcc===Infinity?0:lastAcc),
+    posSrc:dispatchPos.manual?'manual':'gps',
+    place:dispatchPos.place||null,
+    status:'جديد'
+  };
+  RT.addCase(c);
+  lastCaseId=c.id;
+  updateTimeline('البلاغ أُرسل بنجاح','موقع + حالة');show('scDone');toast('المسعف قادم');
+  fetchAddr(c.coords[0],c.coords[1]).then(a=>{if(a&&RT.getCase(c.id))RT.updateCase(c.id,{addr:a});});
+}
+
+function fetchAddr(lat,lng){
+  return fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+lat+'&lon='+lng)
+    .then(function(r){return r.json();})
+    .then(function(d){return d&&d.display_name?d.display_name:'';})
+    .catch(function(){return '';});
+}
+
+// الربط الحي: تحديث «المسعف قادم» حسب حالة المسعف
+function liveStatusFor(c){
+  const line=document.getElementById('liveStatusLine');if(!line)return;
+  if(!c||c.id!==lastCaseId)return;
+  const m={'جديد':'المسعف قادم','تم القبول':'المسعف قبِل البلاغ','في الطريق':'المسعف في الطريق إليك','وصل الموقع':'المسعف وصل الموقع'};
+  line.textContent=m[c.status]||line.textContent;
+}
+if(window.RT){
+  RT.on('case-update',liveStatusFor);
+  RT.on('case-removed',m=>{if(m&&m.id===lastCaseId){const l=document.getElementById('liveStatusLine');if(l)l.textContent='اكتمل البلاغ';}});
+  RT.on('amb-telemetry',t=>{
+    if(!t||t.id!==lastCaseId)return;const l=document.getElementById('liveStatusLine');if(!l)return;
+    if(t.status==='arrived')l.textContent='المسعف وصل الموقع';
+    else if(t.eta!=null&&t.eta>0)l.textContent='المسعف قادم — الوصول خلال '+Math.round(t.eta)+' دقيقة';
+  });
 }
 
 function updateTimeline(txt,tag){
