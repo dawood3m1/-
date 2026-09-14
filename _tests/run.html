@@ -53,39 +53,46 @@
     rec(ud.querySelectorAll('#condsBox .cond').length===8,'INDEX: 8 حالات صحية مرسومة ('+ud.querySelectorAll('#condsBox .cond').length+')');
     rec(typeof u.condTap==='function'&&typeof u.confirmNearby==='function','INDEX: دوال الحالة والتقاط بطاقة القريب موجودة');
 
-    // الذهاب إلى شاشة البلاغ
+    // الضغط على طلب إسعاف يرسل البلاغ فوراً (موقع يدوي بدل GPS)
+    u.dispatchPos={lat:21.497,lng:39.2444,manual:true};
     u.startReport();
-    await sleep(300);
-    rec(ud.querySelector('#scReport').classList.contains('active'),'INDEX: «طلب إسعاف» ينقل إلى شاشة البلاغ scReport');
+    await sleep(700);
+    rec(!!u.lastCaseId&&u.RT.getCase(u.lastCaseId),'INDEX: البلاغ أُنشئ فوراً بدون تعبئة بيانات');
+    rec(u.RT.getCase(u.lastCaseId).coords[0]===21.497,'INDEX: إحداثيات الموقع وُجدت في البلاغ');
+    rec(ud.querySelector('#scReport').classList.contains('active'),'INDEX: ينتقل لشاشة التعبئة scReport');
 
-    // إرسال بدون اختيار شخص → تنبيه
-    u.sendReport();
-    await sleep(250);
-    rec(!ud.querySelector('#scDone').classList.contains('active')&&ud.getElementById('snack').textContent.indexOf('اختر مين')>-1,'INDEX: الإرسال دون اختيار يعرض تنبيهاً');
-
-    // اختيار «أنت / أحد أفراد العائلة»
+    // التعبئة — توصل مباشرة بدون إرسال
     u.pickKind(ud.querySelectorAll('#kindIds .id')[0],'family');
     await sleep(200);
     rec(!ud.getElementById('famList').classList.contains('hidden')&&ud.querySelectorAll('#famList .id').length===4,'INDEX: قائمة العائلة تظهر (4 أشخاص)');
     u.pickFamily(ud.querySelectorAll('#famList .id')[0],0);
-    await sleep(200);
+    await sleep(250);
     rec(!ud.getElementById('profileBox').classList.contains('hidden')&&ud.getElementById('profileBox').textContent.indexOf('O+')>-1,'INDEX: البروفايل الذاتي يعرض فصيلة الدم');
+    rec(u.RT.getCase(u.lastCaseId).blood==='O+','INDEX: فصيلة الدم وصلت البلاغ مباشرة (syncCase)');
 
-    // إرسال البلاغ النهائي (بعد ضبط الموقع يدوياً بدل GPS)
-    u.dispatchPos={lat:21.497,lng:39.2444,manual:true};
+    u.condTap(ud.querySelectorAll('#condsBox .cond')[3],3);
+    await sleep(250);
+    rec(u.RT.getCase(u.lastCaseId).conds.length>=1,'INDEX: الحالة الصحية وصلت مباشرة ('+u.RT.getCase(u.lastCaseId).conds.join('،')+')');
+
+    // عرض حالة البلاغ
     u.sendReport();
-    await sleep(300);
-    rec(ud.querySelector('#scDone').classList.contains('active'),'INDEX: الإرسال يفتح شاشة النتيجة scDone');
+    await sleep(250);
+    rec(ud.querySelector('#scDone').classList.contains('active'),'INDEX: عرض حالة البلاغ scDone مفتوح');
     rec(ud.getElementById('liveStatusLine').textContent.indexOf('المسعف قادم')>-1,'INDEX: رسالة «المسعف قادم» تظهر للمبلّغ');
-    rec(ud.querySelectorAll('#timeline .tl-item').length>=1,'INDEX: سجل الإرسال الفوري يضيف إدخالاً');
 
-    // البطاقة الإسعافية
+    // التتبع الحي
+    u.RT.updateCase(u.lastCaseId,{status:'في الطريق'});
+    await sleep(250);
+    rec(ud.getElementById('liveStatusLine').textContent.indexOf('في الطريق')>-1,'INDEX: «المسعف في الطريق إليك» يظهر حياً');
+    u.RT.emit('amb-telemetry',{id:u.lastCaseId,eta:6,status:'enroute'});
+    await sleep(250);
+    rec(ud.getElementById('liveStatusLine').textContent.indexOf('دقيقة')>-1,'INDEX: زمن الوصول المتبقي يظهر حياً');
+
+    // البطاقة الإسعافية + الأماكن
     u.openCard();
     await sleep(200);
     rec(ud.getElementById('cardModal')&&ud.getElementById('cardModal').textContent.indexOf('O+')>-1,'INDEX: البطاقة الإسعافية تعرض فصيلة الدم');
     u.closeModal('cardModal');
-
-    // الأماكن المحفوظة
     rec(typeof u.openSavePlace==='function'&&typeof u.getPlaces==='function','INDEX: واجهة الأماكن المحفوظة موجودة');
 
     // ===== 2) الصفحة الثانية: لوحة المسعف =====

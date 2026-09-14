@@ -425,7 +425,7 @@
       <div class="conds" id="condsBox"></div>
       <textarea id="desc" placeholder="أضف وصفاً إضافياً (اختياري)…"></textarea>
     </div>
-    <button class="btn send" onclick="sendReport()">إرسال البلاغ النهائي</button>
+    <button class="btn send" onclick="sendReport()">عرض حالة البلاغ</button>
   </section>
 
   <section id="scDone" class="screen">
@@ -634,8 +634,42 @@ function confirmManual(){
   toast('تم تثبيت الموقع على الدبوس');
 }
 
-function startReport(){show('scReport');toast('تم إرسال موقعك للمسعف على الفور');}
-function condTap(el,i){el.classList.toggle('sel');updateTimeline(`الحالة: ${CONDITIONS[i].t}`,'للمسعف');toast(`تم إرسال: ${CONDITIONS[i].t}`);}
+function startReport(){
+  getReadyPos().then(function(pos){
+    if(!pos){toast('المكان لم يتحدد بعد — انتظر الـGPS أو اضبط الدبوس ثم أعد المحاولة');return;}
+    const p=pickedPerson||{};
+    const c={
+      id:'c'+Date.now(),ts:Date.now(),kind:pickedKind||'quick',
+      name:p.name||'مستعجل',age:p.age||'—',blood:p.blood||'—',
+      allergy:p.allergy||'لا يوجد',drugs:p.drugs||'لا يوجد',ops:p.ops||'لا يوجد',chronic:p.chronic||'لا يوجد',
+      relation:p.relation||'بلاغ فوري',reporter:p.name||'المستخدم',
+      conds:['حالة أخرى'],desc:'الموقع أُرسل فوراً، التفاصيل قادمة',
+      priority:'stable',coords:[pos.lat,pos.lng],acc:Math.round(pos.accuracy||0),
+      posSrc:pos.manual?'manual':'gps',place:pos.place||null,status:'جديد'
+    };
+    RT.addCase(c);
+    lastCaseId=c.id;
+    document.getElementById('liveStatusLine').textContent='المسعف قادم';
+    show('scReport');
+    updateTimeline('زر الطوارئ — أُرسل الموقع للمسعف فوراً','موقع فوري');
+    toast('أُرسل البلاغ فوراً — اعبي التفاصيل وبتوصل مباشرة');
+    fetchAddr(c.coords[0],c.coords[1]).then(a=>{if(a&&RT.getCase(c.id))RT.updateCase(c.id,{addr:a});});
+  });
+}
+
+function getReadyPos(){
+  return new Promise(res=>{
+    if(dispatchPos)return res(dispatchPos);
+    if(!navigator.geolocation)return res(null);
+    navigator.geolocation.getCurrentPosition(p=>{
+      if(dispatchPos)return res(dispatchPos);
+      const pos={lat:p.coords.latitude,lng:p.coords.longitude,manual:false,accuracy:p.coords.accuracy,source:'gps'};
+      if(!dispatchPos)dispatchPos=pos;
+      res(dispatchPos);
+    },()=>res(dispatchPos||null),{enableHighAccuracy:true,timeout:8000,maximumAge:0});
+  });
+}
+function condTap(el,i){el.classList.toggle('sel');updateTimeline(`الحالة: ${CONDITIONS[i].t}`,'للمسعف');toast(`تم إرسال: ${CONDITIONS[i].t}`);syncCase();}
 
 function pickKind(el,kind){
   pickedKind=kind;
@@ -659,7 +693,7 @@ function pickFamily(el,i){
   const p=FAMILY[i],box=document.getElementById('profileBox');box.classList.remove('hidden');
   pickedPerson=p;
   box.innerHTML=`<div class="name">${p.name}</div><svg class="ic"><use href="#i-user"/></svg> العمر: <b class="blood-mono">${p.age}</b><br><svg class="ic"><use href="#i-drop"/></svg> فصيلة الدم: <b class="blood-mono">${p.blood}</b><br><svg class="ic"><use href="#i-pill"/></svg> الأدوية: <b>${p.drugs}</b><br><svg class="ic"><use href="#i-alert"/></svg> الحساسية: <b>${p.allergy}</b><br><svg class="ic"><use href="#i-clipboard"/></svg> آخر عملية: <b>${p.ops}</b><br><svg class="ic"><use href="#i-clipboard"/></svg> الأمراض المزمنة: <b>${p.chronic}</b>`;
-  toast(`تم تحويل الملف إلى: ${p.name.split('—')[1]||p.name}`);updateTimeline(`بروفايل الحالة: ${p.name}`,'أُرسل');
+  toast(`تم تحويل الملف إلى: ${p.name.split('—')[1]||p.name}`);updateTimeline(`بروفايل الحالة: ${p.name}`,'أُرسل');syncCase();
 }
 
 function resetTap(){
@@ -694,7 +728,7 @@ function confirmNearby(){
   pickedPerson=NEARBY_STRANGER;
   box.innerHTML=`<div class="name">${NEARBY_STRANGER.name}</div><svg class="ic"><use href="#i-user"/></svg> العمر: <b class="blood-mono">${NEARBY_STRANGER.age}</b><br><svg class="ic"><use href="#i-drop"/></svg> فصيلة الدم: <b class="blood-mono">${NEARBY_STRANGER.blood}</b><br><svg class="ic"><use href="#i-lock"/></svg> باقي بياناته الطبية تصل للمسعف مباشرة عند إرسال البلاغ`;
   toast('تم التقاط البطاقة — فصيلة الدم: '+NEARBY_STRANGER.blood);
-  updateTimeline('بلاغ عن شخص بالقرب — فصيلة '+NEARBY_STRANGER.blood,'أُرسل');
+  updateTimeline('بلاغ عن شخص بالقرب — فصيلة '+NEARBY_STRANGER.blood,'أُرسل');syncCase();
 }
 
 function openRecord(){showModal('recordModal');}
@@ -711,30 +745,39 @@ function addToWallet(){
 }
 
 function sendReport(){
-  if(!pickedKind){toast('اختر مين الشخص المبلّغ عنه أولاً');return;}
-  if(!dispatchPos){toast('المكان لم يتحدد بعد — انتظر الـGPS أو اضبط الدبوس ثم أعد المحاولة');return;}
-  const p=pickedPerson||{name:'مستعجل',relation:'بلاغ',age:'—',blood:'—',allergy:'لا يوجد',drugs:'لا يوجد',ops:'لا يوجد',chronic:'لا يوجد'};
-  const conds=[...document.querySelectorAll('#condsBox .cond.sel')].map(b=>b.textContent.trim());
-  const desc=document.getElementById('desc').value.trim();
-  const c={
-    id:'c'+Date.now(),ts:Date.now(),kind:pickedKind,
-    name:p.name||'مستعجل',age:p.age||'—',blood:p.blood||'—',
-    allergy:p.allergy||'لا يوجد',drugs:p.drugs||'لا يوجد',ops:p.ops||'لا يوجد',chronic:p.chronic||'لا يوجد',
-    relation:p.relation||'بروفايل',reporter:p.name||'المستخدم',
-    conds:conds.length?conds:['حالة أخرى'],
-    desc:desc||'لا يوجد وصف إضافي',
-    priority:window.RT&&RT.priorityFor?RT.priorityFor(conds):'stable',
-    coords:[dispatchPos.lat,dispatchPos.lng],
-    acc:Math.round(lastAcc===Infinity?0:lastAcc),
-    posSrc:dispatchPos.manual?'manual':'gps',
-    place:dispatchPos.place||null,
-    status:'جديد'
-  };
-  RT.addCase(c);
-  lastCaseId=c.id;
-  updateTimeline('البلاغ أُرسل بنجاح','موقع + حالة');show('scDone');toast('المسعف قادم');
-  fetchAddr(c.coords[0],c.coords[1]).then(a=>{if(a&&RT.getCase(c.id))RT.updateCase(c.id,{addr:a});});
+  if(!lastCaseId){toast('ابدأ بلاغاً من زر طلب الإسعاف أولاً');return;}
+  show('scDone');updateTimeline('عرض حالة البلاغ','موقع + حالة');toast('المسعف قادم');
 }
+
+function syncCase(){
+  if(!lastCaseId)return;
+  const cur=RT.getCase(lastCaseId);if(!cur)return;
+  const patch={};
+  if(pickedKind)patch.kind=pickedKind;
+  if(pickedPerson){
+    const q=pickedPerson;
+    patch.name=q.name||cur.name;
+    patch.age=q.age||'—';
+    patch.blood=q.blood||'—';
+    patch.allergy=q.allergy||'لا يوجد';
+    patch.drugs=q.drugs||'لا يوجد';
+    patch.ops=q.ops||'لا يوجد';
+    patch.chronic=q.chronic||'لا يوجد';
+    patch.relation=q.relation||'بروفايل';
+    patch.reporter=q.name||'المستخدم';
+  }
+  const conds=[...document.querySelectorAll('#condsBox .cond.sel')].map(b=>b.textContent.trim());
+  patch.conds=conds.length?conds:(cur.conds||['حالة أخرى']);
+  const dv=document.getElementById('desc').value.trim();
+  patch.desc=dv?dv:(cur.desc||'لا يوجد وصف إضافي');
+  patch.priority=RT.priorityFor(patch.conds);
+  RT.updateCase(lastCaseId,patch);
+}
+let descSyncTimer=null;
+(function(){
+  const de=document.getElementById('desc');
+  if(de){de.addEventListener('input',function(){clearTimeout(descSyncTimer);descSyncTimer=setTimeout(syncCase,400);});}
+})();
 
 function fetchAddr(lat,lng){
   return fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+lat+'&lon='+lng)
